@@ -30,6 +30,12 @@ If the installation was successful, you should be able to run the following comm
     $ npm --version
     6.1.0
 
+### MongoDB
+- #### MongoDB installation on Ubuntu
+
+  You can install mongodb locally by :
+
+      $ sudo apt install mongodb
 
 ## Install
 
@@ -41,3 +47,10 @@ If the installation was successful, you should be able to run the following comm
 ## Running the project in dev mode
 
     $ npm run dev
+
+## TODO
+
+- [ ] Use form.urlencoded method to extract url data
+- [ ] Alternative for `valid-url` module to check urls
+- [ ] Make code 6 digit psuedo-random.
+- [ ] Add option for the user to give custom short url
