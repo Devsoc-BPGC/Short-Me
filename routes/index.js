@@ -5,7 +5,7 @@ const Url = require('../models/Url');
 
 
 // @route   GET /:code
-// @desc    Redirect to original url
+// @desc    Redirect short URL to original URL
 router.get('/:code', async (req, res) => {
     try {
         const code = req.params.code;

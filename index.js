@@ -1,14 +1,14 @@
 
 const express = require('express');
 const connectDB = require('./config/db');
-const bodyParser = require('body-parser');
+
 const app = express();
 
 // Connect to database
 connectDB();
 
+// Middleware functions
 app.use(express.json());
-app.use(bodyParser.urlencoded())
 
 // Define Routes
 app.use('/', require('./routes/index'));

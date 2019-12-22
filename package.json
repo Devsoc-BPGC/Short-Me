@@ -15,7 +15,6 @@
     "config": "^3.2.4",
     "express": "^4.17.1",
     "mongoose": "^5.8.2",
-    "shortid": "^2.2.15",
     "valid-url": "^1.0.9"
   },
   "devDependencies": {
