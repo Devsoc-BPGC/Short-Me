@@ -3,6 +3,8 @@ const router = express.Router();
 const validUrl = require('valid-url');
 const base = require('base-converter');
 const config = require('config');
+const MT = require('mersenne-twister');
+const generator = new MT();
 
 const Url = require('../models/Url');
 
@@ -21,23 +23,28 @@ router.post('/shorten', async (req, res) => {
   // basically mapping the id of the document in the mongodb schema to
   // a base 62 string.
   // See this for more info: https://stackoverflow.com/a/742047
-  const currCount = await Url.countDocuments();
-  urlCode = base.decTo62(currCount + 1);
+  
   // Check if long url is valid
   if (validUrl.isUri(longUrl)) {
     try {
-      let url = await Url.findOne({ longUrl });
+      let url = await Url.findOne({ longUrl });//to check if url already exists
 
       if (url) {
         res.json(url);
       } else {
+        urlCode = base.decTo62(generator.random_int()); //generating a mersenne-twister random number
+        let Code = await Url.findOne({ urlCode });
+        while (Code) {
+          urlCode = base.decTo62(generator.random_int()); //generating a mersenne-twister random number
+          Code = await Url.findOne({ urlCode });
+        }
         const shortUrl = baseUrl + '/' + urlCode;
 
         url = new Url({
-          longUrl,
-          shortUrl,
-          urlCode,
-          date: new Date()
+        longUrl,
+        shortUrl,
+        urlCode,
+        date: new Date()
         });
 
         await url.save();
