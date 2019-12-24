@@ -25,10 +25,16 @@ router.post('/shorten', async (req, res) => {
 
       if (url)
       {
-        if (url.urlCode === customCode) {
+        //To check if the long url entered by the user is already stored in the database with the given custom url.
+        if (url.longUrl == longUrl) {
+          res.json(url);
+        }
+        //The custom url entered is already in use and is associated with a different long url.
+        else {
             res.status(400).json("That url code is already used. Try another");
       } 
-    }else {
+    } //The custom url entered is unique and can be used to generate short url.
+      else {
         const shortUrl = baseUrl + '/' + customCode;
         const urlCode = customCode;
         url = new Url({
