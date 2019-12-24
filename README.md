@@ -50,7 +50,7 @@ If the installation was successful, you should be able to run the following comm
 
 ## TODO
 
-- [ ] Use form.urlencoded method to extract url data
+- [x] Use form.urlencoded method to extract url data
 - [ ] Alternative for `valid-url` module to check urls
-- [ ] Make code 6 digit psuedo-random.
-- [ ] Add option for the user to give custom short url
+- [x] Make code 6 digit psuedo-random.
+- [x] Add option for the user to give custom short url
