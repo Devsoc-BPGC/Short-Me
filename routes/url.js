@@ -8,6 +8,11 @@ const generator = new MT();
 
 const Url = require('../models/Url');
 
+//function pads 0 upto 6 digits
+function padDigits (number, digits) {
+	return Array(Math.max(digits - String(number).length + 1, 0)).join(0) + number;
+}
+
 // @route     POST /api/url/shorten
 // @desc      Create short URL from long URL
 router.post('/shorten', async (req, res) => {
@@ -34,11 +39,12 @@ router.post('/shorten', async (req, res) => {
       } else {
         urlCode = base.decTo62(generator.random_int()); //generating a mersenne-twister random number
         let Code = await Url.findOne({ urlCode });
+        //The while block runs until the urlCode generated is unique
         while (Code) {
           urlCode = base.decTo62(generator.random_int()); //generating a mersenne-twister random number
           Code = await Url.findOne({ urlCode });
         }
-        const shortUrl = baseUrl + '/' + urlCode;
+        const shortUrl = baseUrl + '/' + padDigits(urlCode,6);
 
         url = new Url({
         longUrl,
