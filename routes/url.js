@@ -18,16 +18,6 @@ router.post('/shorten', async (req, res) => {
   const longUrl = req.body.longUrl;
   const customCode = req.body.customCode;
   const baseUrl = config.get('baseUrl');
-
-  // Check if base url is valid
-  if (!validUrl.isUri(baseUrl)) {
-    return res.status(401).json('Invalid base url');
-  }
-
-  // Create url code
-  // basically mapping the id of the document in the mongodb schema to
-  // a base 62 string.
-  // See this for more info: https://stackoverflow.com/a/742047
   
   // Check if custom code exists
   //If no, the following block generates random urlCode
