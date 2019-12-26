@@ -15,6 +15,7 @@ app.use(bodyParser.urlencoded({ extended:true }));
 // Define Routes
 app.use('/', require('./routes/index'));
 app.use('/api/url', require('./routes/url'));
+app.use('/api/user', require('./routes/user'));
 
 
 const PORT = 5000;
