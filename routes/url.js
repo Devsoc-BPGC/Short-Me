@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const validUrl = require('valid-url');
 const base = require('base-converter');
 const config = require('config');
 const MT = require('mersenne-twister');

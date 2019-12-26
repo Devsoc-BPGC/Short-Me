@@ -15,8 +15,7 @@
     "config": "^3.2.4",
     "express": "^4.17.1",
     "mersenne-twister": "^1.1.0",
-    "mongoose": "^5.8.2",
-    "valid-url": "^1.0.9"
+    "mongoose": "^5.8.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.2"
