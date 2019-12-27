@@ -37,7 +37,7 @@ router.post("/register", async (req, res) => {
   const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
   // Create a new user
-  const user = new User({
+  let user = new User({
     name: req.body.name,
     email: req.body.email,
     password: hashedPassword
@@ -47,6 +47,14 @@ router.post("/register", async (req, res) => {
     res.send({
       user_id: user._id
     });
+    //Create and assign token
+    const TOKEN_SECRET = config.get("tokenSecret")
+    const token = jwt.sign({_id: user._id}, TOKEN_SECRET);
+    res.header("auth-token", token).send(token);
+    res.header("userid", user._id).send(user._id);
+    
+    res.redirect('/dashboard');
+
   } catch (err) {
     res.status(400).send(err);
   }
@@ -67,7 +75,7 @@ router.post("/login", async (req, res) => {
   }
 
   // Check if email exists
-  const user = await User.findOne({
+  let user = await User.findOne({
     email: req.body.email
   });
   if (!user) {
@@ -83,6 +91,9 @@ router.post("/login", async (req, res) => {
   const TOKEN_SECRET = config.get("tokenSecret")
   const token = jwt.sign({_id: user._id}, TOKEN_SECRET);
   res.header("auth-token", token).send(token);
+  res.header("userid", user._id).send(user._id);
+
+  res.redirect('/dashboard');
 });
 
 
@@ -94,4 +105,106 @@ router.get('/dashboard', verify, (req, res) => {
 })
 
 
+// @route   POST /api/user/shorten
+// @desc    Api for generating short url from dashboard
+router.post('/shorten', async (req, res) => {
+    const _id = req.header.userid;
+    const user = await User.findOne({ _id });
+    const longUrl = req.body.longUrl;
+    const customCode = req.body.customCode;
+    const baseUrl = config.get('baseUrl');
+
+    if (!customCode) {
+      try {
+        let url = await Url.findOne({ longUrl });//to check if url already exists
+  
+        if (url) {
+          res.json(url);
+        } else {
+          urlCode = base.decTo62(generator.random_int()); //generating a mersenne-twister random number
+          let Code = await Url.findOne({ urlCode });
+          //The while block runs until the urlCode generated is unique
+          while (Code) {
+            urlCode = base.decTo62(generator.random_int()); //generating a mersenne-twister random number
+            Code = await Url.findOne({ urlCode });
+          }
+          const shortUrl = baseUrl + '/' + padDigits(urlCode,6);
+  
+          url = new Url({
+          longUrl,
+          shortUrl,
+          urlCode,
+          date: new Date()
+          });
+  
+          await url.save();
+          user.urls.push( url );
+          
+          //Create and assign a token
+          const TOKEN_SECRET = config.get("tokenSecret")
+          const token = jwt.sign({_id: user._id}, TOKEN_SECRET);
+          res.header("auth-token", token).send(token);
+          res.header("userid", user._id).send(user._id);
+          
+          res.redirect('/dashboard');
+        }
+      } catch (err) {
+        console.error(err);
+        res.status(500).json('Server error');
+      }
+    } //The following block runs when customCode is given
+    else {
+      try {
+        let url = await Url.findOne({ urlCode: customCode }); // Check if the custom code already exists
+  
+        if (url)
+        {
+          //To check if the long url entered by the user is already stored in the database with the given custom url.
+          if (url.longUrl == longUrl) {
+            res.json(url);
+          }
+          //The custom url entered is already in use and is associated with a different long url.
+          else {
+              res.status(400).json("That url code is already used. Try another");
+        } 
+      } //The custom url entered is unique and can be used to generate short url.
+        else {
+          const shortUrl = baseUrl + '/' + customCode;
+          const urlCode = customCode;
+          url = new Url({
+          longUrl,
+          shortUrl,
+          urlCode,
+          date: new Date()
+          });
+
+          await url.save();
+          user.urls.push( url );
+
+          //Create and assign a token
+          const TOKEN_SECRET = config.get("tokenSecret")
+          const token = jwt.sign({_id: user._id}, TOKEN_SECRET);
+          res.header("auth-token", token).send(token);
+          res.header("userid", user._id).send(user._id);          
+  
+          res.redirect('/dashboard');
+        }
+      } catch (err) {
+        console.error(err);
+        res.status(500).json('Server error');
+      }
+    }
+});
+
+router.get('/login', (req, res) => {
+  //Render login page
+})
+
+router.get('/register', (req, res) => {
+  //Render register page
+})
+
+router.get('/signout', (req, res) => {
+  //Redirect to home page.
+})
 module.exports = router;

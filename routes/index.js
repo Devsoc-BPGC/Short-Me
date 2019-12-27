@@ -12,6 +12,8 @@ router.get('/:code', async (req, res) => {
         const url = await Url.findOne({ urlCode: code });
     
         if (url){
+            const clicks = url.redirectCount + 1;
+            url.update({redirectCount: clicks});
             return res.redirect(url.longUrl);
         } else {
             return res.status(404).json('No url found with given code');

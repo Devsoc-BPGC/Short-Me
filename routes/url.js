@@ -6,6 +6,9 @@ const MT = require('mersenne-twister');
 const generator = new MT();
 
 const Url = require('../models/Url');
+const User = require('../models/User');
+
+user = User.findOne({ name: '@Admin' });
 
 //function pads 0 upto 6 digits
 function padDigits (number, digits) {
@@ -18,6 +21,9 @@ router.post('/shorten', async (req, res) => {
   const longUrl = req.body.longUrl;
   const customCode = req.body.customCode;
   const baseUrl = config.get('baseUrl');
+  const name = config.get('name');
+  const email = config.get('email');
+  const password = config.get('password');
   
   // Check if custom code exists
   //If no, the following block generates random urlCode
@@ -41,10 +47,12 @@ router.post('/shorten', async (req, res) => {
         longUrl,
         shortUrl,
         urlCode,
+        redirectCount = 0,
         date: new Date()
         });
 
         await url.save();
+        user.urls.push(url);
 
         res.json(url);
       }
@@ -75,10 +83,12 @@ router.post('/shorten', async (req, res) => {
         longUrl,
         shortUrl,
         urlCode,
+        redirectCount = 0,
         date: new Date()
         });
 
         await url.save();
+        user.urls.push(url);
 
         res.json(url);
       }

@@ -1,5 +1,8 @@
 {
-    "mongoURI": "mongodb://localhost:27017/url-shortener",
+    "mongoURI": "mongodb://localhost:20000/url-shortener",
     "baseUrl": "http://localhost:5000",
+    "name" : "@Admin",          
+    "email" : "Admin@123",     
+    "password" : "1234567",    
     "tokenSecret": "extremely_secret_key"
 }
