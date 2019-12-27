@@ -8,7 +8,7 @@ const urlSchema = new mongoose.Schema({
     date: { type:String, default: Date.now }
 });
 */
-const Url = require('../models/Url');
+const Url = require('../models/Url').schema;//Should be .schema?
 
 const userSchema = new mongoose.Schema({
     name: {
