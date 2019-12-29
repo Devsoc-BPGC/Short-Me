@@ -2,8 +2,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const connectDB = require('./config/db');
-
+const dotenv = require('dotenv');
 const app = express();
+
+dotenv.config();
 
 // Connect to database
 connectDB();
@@ -16,7 +18,7 @@ app.use(bodyParser.urlencoded({ extended:true }));
 app.use('/', require('./routes/index'));
 app.use('/api/url', require('./routes/url'));
 app.use('/api/user', require('./routes/user'));
-
+app.use('/api/login/google', require('./routes/googleAuth'));
 
 const PORT = 5000;
 
