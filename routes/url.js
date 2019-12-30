@@ -30,10 +30,10 @@ router.post('/shorten', async (req, res) => {
   if (!customCode) {
     try {
       let url = await Url.findOne({ longUrl });//to check if url already exists
-
-      if (url) {
+    //generating different randomUrl due to redirectcount problem(refer user.js)
+      /* if (url) {
         res.json(url);
-      } else {
+      } else { */
         urlCode = base.decTo62(generator.random_int()); //generating a mersenne-twister random number
         let Code = await Url.findOne({ urlCode });
         //The while block runs until the urlCode generated is unique
@@ -47,7 +47,7 @@ router.post('/shorten', async (req, res) => {
         longUrl,
         shortUrl,
         urlCode,
-        redirectCount = 0,
+        redirectCount: 0,
         date: new Date()
         });
 
@@ -55,7 +55,7 @@ router.post('/shorten', async (req, res) => {
         user.urls.push(url);
 
         res.json(url);
-      }
+      //}
     } catch (err) {
       console.error(err);
       res.status(500).json('Server error');
@@ -83,7 +83,7 @@ router.post('/shorten', async (req, res) => {
         longUrl,
         shortUrl,
         urlCode,
-        redirectCount = 0,
+        redirectCount: 0,
         date: new Date()
         });
 
@@ -100,4 +100,3 @@ router.post('/shorten', async (req, res) => {
   });
 
 module.exports = router;
-

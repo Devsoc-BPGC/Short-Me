@@ -8,7 +8,7 @@ const urlSchema = new mongoose.Schema({
     date: { type:String, default: Date.now }
 });
 */
-const Url = require('../models/Url');
+const { Url, urlSchema } = require('../models/Url');
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
         min: 6
     },
     
-    urls: [Url], //urls: [urlSchema]
+    urls: [urlSchema], //urls: [urlSchema]
 
     date: {
         type: Date,
