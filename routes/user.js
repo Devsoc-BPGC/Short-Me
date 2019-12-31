@@ -80,7 +80,7 @@ router.post("/register", async (req, res) => {
   return res.redirect('/api/user/registerpage');
   }
 
-  if(hasWhiteSpace = true){
+  if(hasWhiteSpace(user.name)){
     //res.send('Username cannot contain a whitespace');
     return res.redirect('/api/user/loginpage');
   }
@@ -249,32 +249,9 @@ router.post('/shorten/:token/:name', async (req, res) => {
         try {
           let url = await Url.findOne({ urlCode: customCode }); // Check if the custom code already exists
           
-          if (url)
-          {
-            //To check if the long url entered by the user is already stored in the database with the given custom url.
-            //This case where two users can have same longUrl for customUrl has a problem since redirectCount can never be personalized.
-            if (url.longUrl == longUrl) {
-            //console.log('Long Url already exists');
-            await user.urls.push( url );
-            await user.save();
-            //console.log(user.urls[1]);
-            //console.log(user.email);
-            const query = querystring.stringify({
-            "token": token,
-            "username": user.name
-            });
-            //if error comes to use try-catch for throwing into async function, use it for register as well
-            try{
-            return res.redirect('/api/user/dashboard/?' + query);
-            // console.log('Redirected.');
-            } catch (err) {
-            console.log('error', err);
-          }
-            }
-            //The custom url entered is already in use and is associated with a different long url.
-            else {
-                res.status(400).json("That url code is already used. Try another");
-          } 
+          if (url){
+            //If customCode is already present in the document then we let anyone use it.
+            res.status(400).json("That url code is already used. Try another");
         } //The custom url entered is unique and can be used to generate short url.
           else {
             const shortUrl = baseUrl + '/' + customCode;
