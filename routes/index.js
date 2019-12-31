@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router();
 
 const Url = require('../models/Url');
-const User = require('../Tiny-Url/models/User');
+const User = require('../models/User');
 
 //This function updates the field redirectCount in both url and user 
 async function Count(url){
