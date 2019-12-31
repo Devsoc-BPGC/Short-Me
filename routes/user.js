@@ -80,7 +80,7 @@ router.post("/register", async (req, res) => {
   return res.redirect('/api/user/registerpage');
   }
 
-  if(hasWhiteSpace = true){
+  if(hasWhiteSpace(req.body.name)){
     //res.send('Username cannot contain a whitespace');
     return res.redirect('/api/user/loginpage');
   }
