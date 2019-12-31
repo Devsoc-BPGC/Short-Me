@@ -8,6 +8,7 @@ const generator = new MT();
 const Url = require('../models/Url');
 const User = require('../models/User');
 
+//All the urls generated for non-users would be saved under admin.
 user = User.findOne({ name: '@Admin' });
 
 //function pads 0 upto 6 digits
@@ -65,16 +66,9 @@ router.post('/shorten', async (req, res) => {
     try {
       let url = await Url.findOne({ urlCode: customCode }); // Check if the custom code already exists
 
-      if (url)
-      {
-        //To check if the long url entered by the user is already stored in the database with the given custom url.
-        if (url.longUrl == longUrl) {
-          res.json(url);
-        }
-        //The custom url entered is already in use and is associated with a different long url.
-        else {
-            res.status(400).json("That url code is already used. Try another");
-      } 
+      if (url) {
+	    //No user can use customUrl already present in the database.
+            res.status(400).json("That url code is already used. Try another"); 
     } //The custom url entered is unique and can be used to generate short url.
       else {
         const shortUrl = baseUrl + '/' + customCode;
