@@ -6,7 +6,7 @@ console.log(db)
 const connectDB = async () =>{
     try{
         await mongoose.connect(db, {
-            useNewUrlParser: true
+            useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false //useFindAndModify set to false so that we can use function FindOneAndUpdate
         });
         console.log('MongoDB Connected!');
     } catch (err) {

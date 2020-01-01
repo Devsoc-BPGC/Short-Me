@@ -1,16 +1,14 @@
-// Middleware function to create private routes by using json web tokens
-
+const config = require('config');
 const jwt = require('jsonwebtoken');
 
-module.exports = function (req, res, next){
-    const token = req.header('auth-token');
-    if(!token) return res.status(401).send('Access Denied');
-    try {
-        const TOKEN_SECRET = config.get("tokenSecret")
-        const verified = jwt.verify(token, TOKEN_SECRET);
-        req.user = verified;
-        next();
-    } catch (err) {
-        res.status(400).send('Invalid token');
-    }
- }
+module.exports = async function (req) {
+    //function replies with a value only if verified else null.
+    const token = req.query.token;
+    if(!token) {return null};
+    const TOKEN_SECRET = config.get("tokenSecret");
+    //token can be verifies async, check if its a better method
+    const verified = jwt.verify(token, TOKEN_SECRET, function (err) {
+        if (err) {return null;}
+    }); 
+    return verified;
+}
