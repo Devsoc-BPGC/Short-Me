@@ -9,7 +9,11 @@ const Url = require('../models/Url');
 const User = require('../models/User');
 
 //All the urls generated for non-users would be saved under admin.
-user = User.findOne({ name: '@Admin' });
+async function FindAdmin() {
+  user = await User.findOne({ name: '@Admin' });
+  //console.log(user.email); If this undefined, then admin hasn't been stored in your database
+}
+FindAdmin();
 
 //function pads 0 upto 6 digits
 function padDigits (number, digits) {
@@ -27,9 +31,6 @@ router.post('/shorten', async (req, res) => {
   }
   const customCode = req.body.customCode;
   const baseUrl = config.get('baseUrl');
-  const name = config.get('name');
-  const email = config.get('email');
-  const password = config.get('password');
   
   // Check if custom code exists
   //If no, the following block generates random urlCode
@@ -58,8 +59,9 @@ router.post('/shorten', async (req, res) => {
         });
 
         await url.save();
-        user.urls.push(url);
-
+        await user.urls.push(url);
+	await user.save();
+	    
         res.json(url);
       //}
     } catch (err) {
@@ -87,8 +89,9 @@ router.post('/shorten', async (req, res) => {
         });
 
         await url.save();
-        user.urls.push(url);
-
+        await user.urls.push(url);
+	await user.save();
+	      
         res.json(url);
       }
     } catch (err) {
