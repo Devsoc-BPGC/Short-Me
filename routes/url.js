@@ -11,10 +11,9 @@ const User = require('../models/User');
 //All the urls generated for non-users would be saved under admin.
 async function FindAdmin() {
   user = await User.findOne({ name: '@Admin' });
-  //console.log(user.email); If this undefined, then admin hasn't been stored in your database
+  console.log(user.email);
 }
 FindAdmin();
-
 //function pads 0 upto 6 digits
 function padDigits (number, digits) {
 	return Array(Math.max(digits - String(number).length + 1, 0)).join(0) + number;
@@ -24,20 +23,17 @@ function padDigits (number, digits) {
 // @desc      Create short URL from long URL
 router.post('/shorten', async (req, res) => {
   const longUrl = req.body.longUrl;
-  // check if the url includes the protocol(http) if not add it before saving
-  var check = longUrl.includes('http');
-  if ( !check ) {
-    longUrl = 'https://' + longUrl;
-  }
   const customCode = req.body.customCode;
   const baseUrl = config.get('baseUrl');
+  const name = config.get('name');
+  const email = config.get('email');
+  const password = config.get('password');
   
   // Check if custom code exists
   //If no, the following block generates random urlCode
   if (!customCode) {
     try {
-      let url = await Url.findOne({ longUrl });//to check if url already exists
-    //generating different randomUrl due to redirectcount problem(refer user.js)
+      //generating different randomUrl due to redirectcount problem(refer user.js)
       /* if (url) {
         res.json(url);
       } else { */
@@ -58,10 +54,9 @@ router.post('/shorten', async (req, res) => {
         date: new Date()
         });
 
-        await url.save();
         await user.urls.push(url);
-	await user.save();
-	    
+        await user.save();
+
         res.json(url);
       //}
     } catch (err) {
@@ -71,15 +66,17 @@ router.post('/shorten', async (req, res) => {
   } //The following block runs when customCode is given
   else {
     try {
-      let url = await Url.findOne({ urlCode: customCode }); // Check if the custom code already exists
+      let user = await User.findOne({"urls.urlCode": customCode});
+      // Check if the custom code already exists
 
-      if (url) {
-	    //No user can use customUrl already present in the database.
-            res.status(400).json("That url code is already used. Try another"); 
+      if (user) {  
+        //No user can use customUrl already present in the database.
+        res.status(400).json("That url code is already used. Try another");
     } //The custom url entered is unique and can be used to generate short url.
       else {
         const shortUrl = baseUrl + '/' + customCode;
         const urlCode = customCode;
+        
         url = new Url({
         longUrl,
         shortUrl,
@@ -88,10 +85,9 @@ router.post('/shorten', async (req, res) => {
         date: new Date()
         });
 
-        await url.save();
         await user.urls.push(url);
-	await user.save();
-	      
+        await user.save();
+
         res.json(url);
       }
     } catch (err) {

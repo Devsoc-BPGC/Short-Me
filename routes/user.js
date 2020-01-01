@@ -211,7 +211,6 @@ router.post('/shorten/:token/:name', async (req, res) => {
       //Another reason is that the users might generate short url at different time and one user might have generated some redirectCount in that time.  
       if (!customCode) {
         try {
-          let url = await Url.findOne({ longUrl });//to check if url already exists
           urlCode = base.decTo62(generator.random_int()); //generating a mersenne-twister random number
           let Code = await Url.findOne({ urlCode });
           //The while block runs until the urlCode generated is unique
@@ -228,7 +227,7 @@ router.post('/shorten/:token/:name', async (req, res) => {
           redirectCount: 0,
           date: new Date()
           });
-          await url.save();
+
           await user.urls.push( url );
           await user.save();
           //console.log(user);
@@ -251,34 +250,11 @@ router.post('/shorten/:token/:name', async (req, res) => {
       } //The following block runs when customCode is given
       else {
         try {
-          let url = await Url.findOne({ urlCode: customCode }); // Check if the custom code already exists
+          let user = await User.findOne({"urls.urlCode": customCode}) // Check if the custom code already exists
           
-          if (url)
-          {
-            //To check if the long url entered by the user is already stored in the database with the given custom url.
-            //This case where two users can have same longUrl for customUrl has a problem since redirectCount can never be personalized.
-            if (url.longUrl == longUrl) {
-            //console.log('Long Url already exists');
-            await user.urls.push( url );
-            await user.save();
-            //console.log(user.urls[1]);
-            //console.log(user.email);
-            const query = querystring.stringify({
-            "token": token,
-            "username": user.name
-            });
-            //if error comes to use try-catch for throwing into async function, use it for register as well
-            try{
-            return res.redirect('/api/user/dashboard/?' + query);
-            // console.log('Redirected.');
-            } catch (err) {
-            console.log('error', err);
-          }
-            }
-            //The custom url entered is already in use and is associated with a different long url.
-            else {
-                res.status(400).json("That url code is already used. Try another");
-          } 
+          if (user){
+            //If customCode is already present in the document then we let anyone use it.
+            res.status(400).json("That url code is already used. Try another");
         } //The custom url entered is unique and can be used to generate short url.
           else {
             const shortUrl = baseUrl + '/' + customCode;
@@ -291,7 +267,6 @@ router.post('/shorten/:token/:name', async (req, res) => {
             date: new Date()
             });
 
-            await url.save();
             await user.urls.push(url);
             await user.save();
      
