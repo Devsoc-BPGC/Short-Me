@@ -196,6 +196,10 @@ router.post('/shorten/:token/:name', async (req, res) => {
     const user = await User.findOne({name: username});
     //console.log(user.name);
     const longUrl = req.body.longUrl;
+    var check = longUrl.includes('http'); // checks both if longUrl includes http and https
+    if ( !check ) {
+      longUrl = 'https://' + longUrl;
+    }
     const customCode = req.body.customCode;
     const baseUrl = config.get('baseUrl');
     if (tokenVerified(token)){

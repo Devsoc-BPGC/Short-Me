@@ -20,6 +20,11 @@ function padDigits (number, digits) {
 // @desc      Create short URL from long URL
 router.post('/shorten', async (req, res) => {
   const longUrl = req.body.longUrl;
+  // check if the url includes the protocol(http) if not add it before saving
+  var check = longUrl.includes('http');
+  if ( !check ) {
+    longUrl = 'https://' + longUrl;
+  }
   const customCode = req.body.customCode;
   const baseUrl = config.get('baseUrl');
   const name = config.get('name');

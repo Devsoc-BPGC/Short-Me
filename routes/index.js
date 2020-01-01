@@ -12,7 +12,7 @@ async function Count(url){
     //If more than one user have the same url document embedded in them.
     while(user[i]){
         const filter = {name: user[i].name, "urls._id": url._id};
-        const update = {"urls.$.redirectCount": count};
+        const update = {"urls.$.redirectCount": clicks};
         userp = await User.findOneAndUpdate(filter, update);
         await url.update({redirectCount: clicks});
         await userp.save();
@@ -25,8 +25,9 @@ router.get('/:code', async (req, res) => {
     try {
         const code = req.params.code;
         const url = await Url.findOne({ urlCode: code });
-    
+        
         if (url){
+            // update count for url
             Count(url);
             return res.redirect(url.longUrl);
         } else {
