@@ -9,8 +9,11 @@ const Url = require('../models/Url');
 const User = require('../models/User');
 
 //All the urls generated for non-users would be saved under admin.
-user = User.findOne({ name: '@Admin' });
-
+async function FindAdmin() {
+  user = await User.findOne({ name: '@Admin' });
+  console.log(user.email);
+}
+FindAdmin();
 //function pads 0 upto 6 digits
 function padDigits (number, digits) {
 	return Array(Math.max(digits - String(number).length + 1, 0)).join(0) + number;
@@ -30,8 +33,7 @@ router.post('/shorten', async (req, res) => {
   //If no, the following block generates random urlCode
   if (!customCode) {
     try {
-      let url = await Url.findOne({ longUrl });//to check if url already exists
-    //generating different randomUrl due to redirectcount problem(refer user.js)
+      //generating different randomUrl due to redirectcount problem(refer user.js)
       /* if (url) {
         res.json(url);
       } else { */
@@ -52,8 +54,8 @@ router.post('/shorten', async (req, res) => {
         date: new Date()
         });
 
-        await url.save();
-        user.urls.push(url);
+        await user.urls.push(url);
+        await user.save();
 
         res.json(url);
       //}
@@ -64,15 +66,17 @@ router.post('/shorten', async (req, res) => {
   } //The following block runs when customCode is given
   else {
     try {
-      let url = await Url.findOne({ urlCode: customCode }); // Check if the custom code already exists
+      let user = await User.findOne({"urls.urlCode": customCode});
+      // Check if the custom code already exists
 
-      if (url) {  
+      if (user) {  
         //No user can use customUrl already present in the database.
         res.status(400).json("That url code is already used. Try another");
     } //The custom url entered is unique and can be used to generate short url.
       else {
         const shortUrl = baseUrl + '/' + customCode;
         const urlCode = customCode;
+        
         url = new Url({
         longUrl,
         shortUrl,
@@ -81,8 +85,8 @@ router.post('/shorten', async (req, res) => {
         date: new Date()
         });
 
-        await url.save();
-        user.urls.push(url);
+        await user.urls.push(url);
+        await user.save();
 
         res.json(url);
       }

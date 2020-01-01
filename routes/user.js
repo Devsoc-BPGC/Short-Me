@@ -207,7 +207,6 @@ router.post('/shorten/:token/:name', async (req, res) => {
       //Another reason is that the users might generate short url at different time and one user might have generated some redirectCount in that time.  
       if (!customCode) {
         try {
-          let url = await Url.findOne({ longUrl });//to check if url already exists
           urlCode = base.decTo62(generator.random_int()); //generating a mersenne-twister random number
           let Code = await Url.findOne({ urlCode });
           //The while block runs until the urlCode generated is unique
@@ -224,7 +223,7 @@ router.post('/shorten/:token/:name', async (req, res) => {
           redirectCount: 0,
           date: new Date()
           });
-          await url.save();
+
           await user.urls.push( url );
           await user.save();
           //console.log(user);
@@ -247,9 +246,9 @@ router.post('/shorten/:token/:name', async (req, res) => {
       } //The following block runs when customCode is given
       else {
         try {
-          let url = await Url.findOne({ urlCode: customCode }); // Check if the custom code already exists
+          let user = await User.findOne({"urls.urlCode": customCode}) // Check if the custom code already exists
           
-          if (url){
+          if (user){
             //If customCode is already present in the document then we let anyone use it.
             res.status(400).json("That url code is already used. Try another");
         } //The custom url entered is unique and can be used to generate short url.
@@ -264,7 +263,6 @@ router.post('/shorten/:token/:name', async (req, res) => {
             date: new Date()
             });
 
-            await url.save();
             await user.urls.push(url);
             await user.save();
      
