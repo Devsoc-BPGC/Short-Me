@@ -83,7 +83,7 @@ router.get('/auth/google/callback', function (req, res) {
                 //Redirect with query params 
                 const query = querystring.stringify({
                                     "token": token,
-                                    "userId": String(user._id)
+                                    "username": user.name
                                     });
 
                 //if error comes to use try-catch for throwing into async function, use it for register as well
