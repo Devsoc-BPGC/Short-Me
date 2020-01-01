@@ -4,8 +4,8 @@ connectDB();
 const Url = require('../Tiny-Url/models/Url')
 const User = require('../Tiny-Url/models/User');
 
-/*
-let user = new User({name: '@admin', email: 'admin@123', password: '123456', urls:[]});
+/*Run the code commented below in order to store admin details 
+let user = new User({name: '@Admin', email: 'Admin@123.com', password: '123456', urls:[]});
 try {
     user.save();
     console.log('Saved!');
@@ -14,7 +14,7 @@ try {
 }
 */
 
-
+/*
 async function findUser () {
 let url = await Url.findOne({urlCode: '3pbYju'});
 const count = url.redirectCount +1;
@@ -36,3 +36,4 @@ i++;
 }
 
 findUser();
+*/
