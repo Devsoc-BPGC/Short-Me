@@ -1,4 +1,4 @@
-const connectDB = require('./config/db');
+cconst connectDB = require('./config/db');
 connectDB();
 
 const Url = require('../Tiny-Url/models/Url')
@@ -21,6 +21,7 @@ async function UpdateInc(){
     console.log(user)
 }
 UpdateInc();
+//This below commented code is to be run to store admin
 /*  let user = new User({name: '@Admin', email: 'Admin@123', password: '1234567', urls:[]});
 try {
     user.save();
