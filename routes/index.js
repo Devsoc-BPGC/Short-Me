@@ -13,7 +13,7 @@ router.get('/:code', async (req, res) => {
         const code = req.params.code;
         let user = await User.findOne({"urls.urlCode": code});
         if (user){
-            const filter = {"urls.urlCode": 'hjoKK'};
+            const filter = {"urls.urlCode": code};
             const update = {$inc: {"urls.$.redirectCount": 1}};
             user = await User.findOneAndUpdate(filter, update);
             await user.save();
