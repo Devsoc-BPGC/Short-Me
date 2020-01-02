@@ -52,7 +52,9 @@ If the installation was successful, you should be able to run the following comm
 
 - [ ] Verifyfing whether the email registered is valid.
 - [ ] Verifying whether the url entered is valid
-- [ ] Fixing error of push coming sometimes
-- [ ] remove redirects everywhere and give responses in the text mentioned at whatsapp
-- [ ] fixing x-auth token verification. Any token is working
-- [ ] passing x-auth token in headers
+- [x] Fixing error of push coming sometimes
+- [x] remove redirects everywhere and give responses in the text mentioned at whatsapp
+- [x] fixing x-auth token verification. Any token is working
+- [x] passing x-auth token in headers
+- [ ] check customCode does not contain spaces, new line character
+- [ ] email checking isn't caps sensitive
