@@ -21,8 +21,7 @@ router.get('/:code', async (req, res) => {
             res.status(404).json('Url not found.');
         }
     } catch (err) {
-        console.error(err);
-        res.status(500).json('Server error');
+        res.status(500).json(err);
         
     }
 })

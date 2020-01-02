@@ -21,16 +21,6 @@ function hasWhiteSpace(s) {
   return /\s/g.test(s);
 }
 
-async function tokenVerified(token) {
-  //function replies with a value only if verified else null.
-  if(!token) {return null};
-  const TOKEN_SECRET = config.get("tokenSecret");
-  //token can be verifies async, check if its a better method
-  const verified = jwt.verify(token, TOKEN_SECRET, function (err) {
-      if (err) {return null;}
-  }); 
-  return verified;
-}
 //Since no session we are not using redirectLogin so need to find different way to redirect back to loginpage in case of user not found.
 // Login middleware
 /* const redirectLogin = (req, res, next) => {
@@ -41,14 +31,7 @@ async function tokenVerified(token) {
     next();
   }
 }
-// Dashboard middleware
-const redirectDashboard = (req, res, next) => {
-  if(req.session.userId) {
-    res.redirect('/api/user/dashboard');
-  } else {
-    next();
-  }
-} */
+ */
 
 // @route   POST /api/user/register
 // @desc    Register user
@@ -60,35 +43,31 @@ router.post("/register", async (req, res) => {
   } = registerValidation(req.body);
 
   if (error) {
-  console.log('Invalid user credentials.', error.details[0].message);
-  return res.redirect(400 ,'/api/user/registerpage'); //I think front-end should send error on registerpage like invalid email,etc.
+  return res.status(500).send(error.details[0].message);
   }
   // Check if user already exists
   const emailExist = await User.findOne({
     email: req.body.email
   });
+
   if (emailExist) {
-  //console.log('This email already exists.')
-  return res.redirect('/api/user/registerpage');
+    res.status(400).send("Email already exists");
   }
   
   const nameExist = await User.findOne({
     name: req.body.name
   });
   if (nameExist) {
-  //console.log('This username already exists.')
-  return res.redirect('/api/user/registerpage');
+    res.status(400).send("Username already exists");
   }
 
   if(hasWhiteSpace(req.body.name)){
-    //res.send('Username cannot contain a whitespace');
-    return res.redirect('/api/user/loginpage');
+    res.status(400).send("Username cannot contain a whitespace");
   }
   // Hash passwords
   const salt = await bcrypt.genSalt();
   const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
-  // TODO: Modify user object wrt new schema with urls empty object {}
   // Create a new user 
   let user = new User({
     name: req.body.name,
@@ -96,19 +75,16 @@ router.post("/register", async (req, res) => {
     password: hashedPassword,
     urls: []
   });
+
   try {
     await user.save();
-    // Create and assign a token
-    const TOKEN_SECRET = config.get("tokenSecret")
-    const token = jwt.sign({_id: user._id}, TOKEN_SECRET);
-    //Redirect with query params 
-    const query = querystring.stringify({
-    "token": token,
-    "username": user.name
-    });
-    res.redirect('/api/user/dashboard/?' + query);
+
+    res.send({
+      user_id: user._id
+    })
+
   } catch (err) {
-    return res.redirect('/api/user/registerpage');
+    res.status(400).send(err);
   }
 });
 
@@ -124,7 +100,6 @@ router.post("/login", async (req, res) => {
 
   if (error) {
     res.status(400).send(error.details[0].message);
-    return res.redirect('/api/user/loginpage');
   }
 
   // Check if email exists
@@ -132,94 +107,96 @@ router.post("/login", async (req, res) => {
     email: req.body.email
   });
   if (!user) {
-    //res.status(400).send("Email or the password is wrong");
-    return res.redirect('/api/user/loginpage');
+    res.status(400).send("Email or the password is wrong");
   }
   // Check if password is correct
   const validPass = await bcrypt.compare(req.body.password, user.password);
   if (!validPass) {
-    //res.status(400).send("Email or the password is wrong");
-    return res.redirect('/api/user/loginpage');
+    res.status(400).send("Email or the password is wrong");
   }
-
   // Create and assign a token
   const TOKEN_SECRET = config.get("tokenSecret")
   const token = jwt.sign({_id: user._id}, TOKEN_SECRET);
-  //Redirect with query params 
-  // frontend needs to store this token and userID for further tasks in dashboard
-  const query = querystring.stringify({
-  "token": token,
-  "username": user.name
-  });
-  //if error comes to use try-catch for throwing into async function, use it for register as well
-  try{
-  return res.redirect('/api/user/dashboard/?' + query);
-  // console.log('Redirected.');
-  } catch (err) {
-  console.log('error', err);
-  // return res.redirect('/api/user/loginpage');
-  }
+  res.header("auth-token", token).send(user._id);
 });
-  
-
 
 // @route   GET /api/user/dashboard
+// expects 'auth-token' and 'user-id' in header of request
 // @desc    Dashboard for the logged in  user ( private route )
-router.get('/dashboard', async (req, res) => {
-  const username = req.query.username;
-  //console.log(username);
-  if (verify(req)) {
-    let user = await User.findOne({name: username});
-    if (user) {
-    //console.log(req.query.token);
-    //console.log('In dashboard');
+router.get('/dashboard', verify, async (req, res) => {
+  const user_id = req.header('user_id');
+  try {
+    let user = await User.findById(user_id);
     res.send(user);
-    } else {
-      console.log('User not found');
-      return res.redirect('/api/user/loginpage');
-    }
+  } catch (err) {
+    res.status(500).send("User not found");
   }
-  else {
-    console.log('Not verified.');
-    return res.redirect('/api/user/loginpage');
-  }
+
 })
 
-
 // @route   POST /api/user/shorten
+// expects 'auth-token' and 'user-id' in header of request
 // @desc    Api for generating short url from dashboard
-// Shorten might require session and cookies since we need to keep the user logged in throughout the preocess. And we have no other way to send the data.
-router.post('/shorten/:token/:name', async (req, res) => {
-    // the frontend needs to keep the token saved
-    const token = req.params.token;
-    const username = req.params.name;
-    const user = await User.findOne({name: username});
-    //console.log(user.name);
-    const longUrl = req.body.longUrl;
-    var check = longUrl.includes('http'); // checks both if longUrl includes http and https
-    if ( !check ) {
-      longUrl = 'https://' + longUrl;
+router.post('/shorten', verify, async (req, res) => {
+  const user_id = req.header('user_id');
+  
+  try {
+    let user = await User.findById(user_id);
+    res.send(user);
+  } catch (err) {
+    res.status(500).send("User not found");
+  }
+
+  const longUrl = req.body.longUrl;
+  const customCode = req.body.customCode;
+
+  const baseUrl = config.get('baseUrl');
+
+    //function to pad 0s upto 6 digits
+    function padDigits (number, digits) {
+      return Array(Math.max(digits - String(number).length + 1, 0)).join(0) + number;
     }
-    const customCode = req.body.customCode;
-    const baseUrl = config.get('baseUrl');
-    if (tokenVerified(token)){
-      //function to pad 0s upto 6 digits
-      function padDigits (number, digits) {
-        return Array(Math.max(digits - String(number).length + 1, 0)).join(0) + number;
+    //No two users can have same randomurl since both of them should have different redirectCount and no way to tell if they have same hash
+    //Another reason is that the users might generate short url at different time and one user might have generated some redirectCount in that time.  
+    if (!customCode) {
+      try {
+        urlCode = base.decTo62(generator.random_int()); //generating a mersenne-twister random number
+        let Code = await Url.findOne({ urlCode });
+
+        //The while block runs until the urlCode generated is unique
+        while (Code) {
+        urlCode = base.decTo62(generator.random_int()); //generating a mersenne-twister random number
+        Code = await Url.findOne({ urlCode });
+        }
+        const shortUrl = baseUrl + '/' + padDigits(urlCode,6);
+  
+        url = new Url({
+        longUrl,
+        shortUrl,
+        urlCode,
+        redirectCount: 0,
+        date: new Date()
+        });
+
+        await user.urls.push( url );
+        await user.save();
+        
+        res.status(200).send("Url saved");
+      } catch (err) {
+        res.status(500).send(err);
       }
-      //No two users can have same randomurl since both of them should have different redirectCount and no way to tell if they have same hash
-      //Another reason is that the users might generate short url at different time and one user might have generated some redirectCount in that time.  
-      if (!customCode) {
-        try {
-          urlCode = base.decTo62(generator.random_int()); //generating a mersenne-twister random number
-          let Code = await Url.findOne({ urlCode });
-          //The while block runs until the urlCode generated is unique
-          while (Code) {
-          urlCode = base.decTo62(generator.random_int()); //generating a mersenne-twister random number
-          Code = await Url.findOne({ urlCode });
-          }
-          const shortUrl = baseUrl + '/' + padDigits(urlCode,6);
-    
+    } //The following block runs when customCode is given
+    else {
+      try {
+        let user = await User.findOne({"urls.urlCode": customCode}) // Check if the custom code already exists
+        
+        if (user){
+          //If customCode is already present in the document then we let anyone use it.
+          res.status(400).send("That url code is already used. Try another");
+      } //The custom url entered is unique and can be used to generate short url.
+        else {
+          const shortUrl = baseUrl + '/' + customCode;
+          const urlCode = customCode;
           url = new Url({
           longUrl,
           shortUrl,
@@ -228,66 +205,15 @@ router.post('/shorten/:token/:name', async (req, res) => {
           date: new Date()
           });
 
-          await user.urls.push( url );
+          await user.urls.push(url);
           await user.save();
-          //console.log(user);
-          //console.log(user.email);
-          const query = querystring.stringify({
-          "token": token,
-          "username": user.name
-          });
-          //if error comes to use try-catch for throwing into async function, use it for register as well
-          try{
-          return res.redirect('/api/user/dashboard/?' + query);
-          // console.log('Redirected.');
-          } catch (err) {
-          console.log('error', err);
-          }
-        } catch (err) {
-          console.error(err);
-          res.status(500).json('Server error');
-        }
-      } //The following block runs when customCode is given
-      else {
-        try {
-          let user = await User.findOne({"urls.urlCode": customCode}) // Check if the custom code already exists
-          
-          if (user){
-            //If customCode is already present in the document then we let anyone use it.
-            res.status(400).json("That url code is already used. Try another");
-        } //The custom url entered is unique and can be used to generate short url.
-          else {
-            const shortUrl = baseUrl + '/' + customCode;
-            const urlCode = customCode;
-            url = new Url({
-            longUrl,
-            shortUrl,
-            urlCode,
-            redirectCount: 0,
-            date: new Date()
-            });
 
-            await user.urls.push(url);
-            await user.save();
-     
-            const query = querystring.stringify({
-              "token": token,
-              "username": user.name
-              });
-              //if error comes to use try-catch for throwing into async function, use it for register as well
-              try{
-              return res.redirect('/api/user/dashboard/?' + query);
-              // console.log('Redirected.');
-              } catch (err) {
-              console.log('error', err);
-            }
-          }
-        } catch (err) {
-          console.error(err);
-          res.status(500).json('Server error');
+          res.status(200).send("Url saved");
         }
+      } catch (err) {
+        res.status(500).send(err);
       }
-  }
+    }
 });
 
 router.get('/loginpage',  (req, res) => {
@@ -302,6 +228,6 @@ router.get('/registerpage',  (req, res) => {
 
 router.get('/signout',  (req, res) => {
   //Redirect to home page.
-  return res.redirect('/api/user/loginpage');
+  return res.send("Signed out");
 })
 module.exports = router;
