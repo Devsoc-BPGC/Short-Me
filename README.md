@@ -46,6 +46,7 @@ If the installation was successful, you should be able to run the following comm
 
 ## Running the project in dev mode
 
+    $ node admintest.js
     $ npm run dev
 
 ## TODO
