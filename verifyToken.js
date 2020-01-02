@@ -5,13 +5,13 @@ const config = require('config');
 
 module.exports = function (req, res, next){
     const token = req.header('auth-token');
-    if(!token) return res.status(401).send('Access Denied');
+    if(!token) return res.status(401).json({"error": "Access Denied"});
     try {
         const TOKEN_SECRET = config.get("tokenSecret")
         const verified = jwt.verify(token, TOKEN_SECRET);
         req.user = verified;
         next();
     } catch (err) {
-        res.status(400).send('Invalid token');
+        res.status(400).json({"error": 'Invalid token'});
     }
  } 

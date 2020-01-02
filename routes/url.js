@@ -52,10 +52,10 @@ router.post('/shorten', async (req, res) => {
         await user.urls.push(url);
         await user.save();
 
-        res.json(url);
+        return res.json(url);
     } catch (err) {
       console.error(err);
-      res.status(500).json('Server error');
+      return res.status(500).json({"error": "Server error"});
     }
   } //The following block runs when customCode is given
   else {
@@ -65,7 +65,7 @@ router.post('/shorten', async (req, res) => {
 
       if (userpresent) {  
         //No user can use customUrl already present in the database.
-        res.status(400).json("That url code is already used. Try another");
+        return res.status(400).json({"error": "That url code is already used. Try another"});
     } //The custom url entered is unique and can be used to generate short url.
       else {
         const shortUrl = baseUrl + '/' + customCode;
@@ -82,11 +82,10 @@ router.post('/shorten', async (req, res) => {
         await user.urls.push(url);
         await user.save();
 
-        res.json(url);
+        return res.json(url);
       }
     } catch (err) {
-      console.error(err);
-      res.status(500).json('Server error');
+      return res.status(500).json({"error": "Server error"});
     }
   }
   });

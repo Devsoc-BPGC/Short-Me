@@ -30,7 +30,7 @@ router.post("/register", async (req, res) => {
   } = registerValidation(req.body);
 
   if (error) {
-  return res.status(500).send(error.details[0].message);
+  return res.status(500).json({"error": error.details[0].message});
   }
   // Check if user already exists
   const emailExist = await User.findOne({
@@ -38,7 +38,7 @@ router.post("/register", async (req, res) => {
   });
 
   if (emailExist) {
-    return res.status(400).send("Email already exists");
+    return res.status(400).json({"error": "Email already exists"});
   }
   
   const nameExist = await User.findOne({
@@ -46,11 +46,11 @@ router.post("/register", async (req, res) => {
   });
 
   if (nameExist) {
-    return res.status(400).send("Username already exists");
+    return res.status(400).json({"error": "Username already exists"});
   }
 
   if(hasWhiteSpace(req.body.name)){
-    return res.status(400).send("Username cannot contain a whitespace");
+    return res.status(400).json({"error": "Username cannot contain a whitespace"});
   }
   // Hash passwords
   const salt = await bcrypt.genSalt();
@@ -67,10 +67,10 @@ router.post("/register", async (req, res) => {
   try {
     await user.save();
 
-    return res.status(200).send('Registration successful!');
+    return res.status(200).json({"msg": "Registration successful!"});
 
   } catch (err) {
-    return res.status(400).send(err);
+    return res.status(400).json({"error": err});
   }
 });
 
@@ -85,7 +85,7 @@ router.post("/login", async (req, res) => {
   } = loginValidation(req.body);
 
   if (error) {
-    return res.status(400).send(error.details[0].message);
+    return res.status(400).json({"error": error.details[0].message});
   }
 
   // Check if email exists
@@ -94,19 +94,19 @@ router.post("/login", async (req, res) => {
   });
 
   if (!user) {
-    return res.status(400).send("Email or the password is wrong");
+    return res.status(400).json({"error": "Email or the password is wrong"});
   }
 
   // Check if password is correct
   const validPass = await bcrypt.compare(req.body.password, user.password);
   if (!validPass){
-    return res.status(400).send("Email or the password is wrong");
+    return res.status(400).json({"error": "Email or the password is wrong"});
   }
 
   // Create and assign a token
   const TOKEN_SECRET = config.get("tokenSecret")
   const token = jwt.sign({_id: user._id}, TOKEN_SECRET);
-  res.header("auth-token", token).send(user._id);
+  res.header("auth-token", token).json({"user_id": user._id});
 });
 
 // @route   GET /api/user/dashboard
@@ -114,12 +114,12 @@ router.post("/login", async (req, res) => {
 // @desc    Dashboard for the logged in  user ( private route )
 router.get('/dashboard', verify, async (req, res) => {
   const user_id = req.header('user_id');
-  if(!user_id) return res.status(500).send('user_id not provided');
+  if(!user_id) return res.status(500).json({"error": "user_id not provided"});
   try {
     let user = await User.findById(user_id);
-    res.send(user);
+    res.json(user);
   } catch (err) {
-    res.status(500).send("User not found");
+    res.status(500).json({"error": "User not found"});
   }
 
 })
@@ -133,7 +133,7 @@ router.post('/shorten', verify, async (req, res) => {
   try {
     var user = await User.findById(user_id);
   } catch (err) {
-    return res.status(500).send("User not found");
+    return res.status(500).json({"error": "User not found"});
   }
   const longUrl = req.body.longUrl;
   const customCode = req.body.customCode;
@@ -153,7 +153,7 @@ router.post('/shorten', verify, async (req, res) => {
         let userpresent = await User.findOne({"urls.longUrl": longUrl});
         if(userpresent){
         if(userpresent.name === user.name){
-          return res.status(422).json('You already have this longUrl.');
+          return res.status(422).json({"error": "You already have this longUrl."});
           }
         }
         try {
@@ -177,9 +177,9 @@ router.post('/shorten', verify, async (req, res) => {
           await user.urls.push( url );
           await user.save();
 
-          return res.status(200).send("Url saved");
+          return res.status(200).json({"msg": "Url saved"});
         } catch (err) {
-          return res.status(500).send(err);
+          return res.status(500).json({"error": err});
         }
       } //The following block runs when customCode is given
       else {
@@ -188,7 +188,7 @@ router.post('/shorten', verify, async (req, res) => {
 
           if (users){
             //If customCode is already present in the document then we let anyone use it.
-            res.status(400).send("That url code is already used. Try another");
+            res.status(400).json({"error": "That url code is already used. Try another"});
         } //The custom url entered is unique and can be used to generate short url.
           else {
             const shortUrl = baseUrl + '/' + customCode;
@@ -205,10 +205,13 @@ router.post('/shorten', verify, async (req, res) => {
             await user.urls.push(url);
             await user.save();
 
-            return res.status(200).send("CustomUrl saved");
+            return res.status(200).json({
+              "Message": "Url saved",
+              "short_url": url.shortUrl
+            });
           }
         } catch (err) {
-          return res.status(500).send(err);
+          return res.status(500).json({"error": err});
         }
     }
 });

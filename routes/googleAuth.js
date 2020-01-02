@@ -2,7 +2,6 @@ const { google } = require('googleapis');
 const express = require('express');
 const config = require('config');
 const jwt = require('jsonwebtoken');
-const querystring = require('querystring');
 const User = require("../models/User");
 
 const router = express.Router();
@@ -67,7 +66,7 @@ router.get('/auth/google/callback', function (req, res) {
                     try {
                         await user.save();
                     } catch (err) {
-                        res.status(400).send(err);
+                        res.status(400).json({"error": err});
                     }
 
                 }
@@ -80,7 +79,7 @@ router.get('/auth/google/callback', function (req, res) {
             // Create and assign a token
             const TOKEN_SECRET = config.get("tokenSecret")
             const token = jwt.sign({_id: user._id}, TOKEN_SECRET);
-            res.header("auth-token", token).send(user._id);
+            res.header("auth-token", token).json({"user_id": user._id});
             }
         });
     }
