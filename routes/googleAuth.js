@@ -25,6 +25,7 @@ router.get('/', async (req, res) => {
             access_type: 'offline',
             scope: defaultScope
         });
+        //If redirect not possible, we can send url to frontend
         res.redirect(url);
 })
 
@@ -76,23 +77,10 @@ router.get('/auth/google/callback', function (req, res) {
                     email: userEmail
                   });
 
-                // Create and assign a token
-                const TOKEN_SECRET = config.get("tokenSecret")
-                const token = jwt.sign({_id: user._id}, TOKEN_SECRET);
-
-                //Redirect with query params 
-                const query = querystring.stringify({
-                                    "token": token,
-                                    "username": user.name
-                                    });
-
-                //if error comes to use try-catch for throwing into async function, use it for register as well
-                try {
-                return res.redirect('/api/user/dashboard/?' + query);
-                } catch (err) {
-                console.log('error', err);
-                return res.redirect('/api/user/loginpage');
-                }
+            // Create and assign a token
+            const TOKEN_SECRET = config.get("tokenSecret")
+            const token = jwt.sign({_id: user._id}, TOKEN_SECRET);
+            res.header("auth-token", token).send(user._id);
             }
         });
     }

@@ -5,7 +5,7 @@ const urlSchema = new mongoose.Schema({
     longUrl: String,
     shortUrl: String,
     redirectCount: Number,
-    date: { type:String, default: Date.now }
+    date: { type:Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Url', urlSchema);
