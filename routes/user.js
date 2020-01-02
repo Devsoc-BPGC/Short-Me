@@ -158,45 +158,23 @@ router.post('/shorten', verify, async (req, res) => {
     }
     //No two users can have same randomurl since both of them should have different redirectCount and no way to tell if they have same hash
     //Another reason is that the users might generate short url at different time and one user might have generated some redirectCount in that time.  
-    if (!customCode) {
-      try {
-        urlCode = base.decTo62(generator.random_int()); //generating a mersenne-twister random number
-        let Code = await Url.findOne({ urlCode });
-
-        //The while block runs until the urlCode generated is unique
-        while (Code) {
-        urlCode = base.decTo62(generator.random_int()); //generating a mersenne-twister random number
-        Code = await Url.findOne({ urlCode });
-        }
-        const shortUrl = baseUrl + '/' + padDigits(urlCode,6);
-  
-        url = new Url({
-        longUrl,
-        shortUrl,
-        urlCode,
-        redirectCount: 0,
-        date: new Date()
-        });
-
-        await user.urls.push( url );
-        await user.save();
-        
-        res.status(200).send("Url saved");
-      } catch (err) {
-        res.status(500).send(err);
+     let userp = await User.findOne({"urls.longUrl": longUrl});
+      if(userp.name === username){
+        return res.status(422).json('You already have this longUrl.');
       }
-    } //The following block runs when customCode is given
-    else {
-      try {
-        let user = await User.findOne({"urls.urlCode": customCode}) // Check if the custom code already exists
-        
-        if (user){
-          //If customCode is already present in the document then we let anyone use it.
-          res.status(400).send("That url code is already used. Try another");
-      } //The custom url entered is unique and can be used to generate short url.
-        else {
-          const shortUrl = baseUrl + '/' + customCode;
-          const urlCode = customCode;
+      //No two users can have same randomurl since both of them should have different redirectCount and no way to tell if they have same hash
+      //Another reason is that the users might generate short url at different time and one user might have generated some redirectCount in that time.  
+      if (!customCode) {
+        try {
+          urlCode = padDigits(base.decTo62(generator.random_int()), 6); //generating a mersenne-twister random number
+          let user = await User.findOne({"urls.urlCode": urlCode});
+          //The while block runs until the urlCode generated is unique
+          while (user) {
+          urlCode = padDigits(base.decTo62(generator.random_int()), 6); //generating a mersenne-twister random number
+          user = await User.findOne({"urls.urlCode": urlCode});
+          }
+          const shortUrl = baseUrl + '/' + urlCode;
+          
           url = new Url({
           longUrl,
           shortUrl,
@@ -205,14 +183,42 @@ router.post('/shorten', verify, async (req, res) => {
           date: new Date()
           });
 
-          await user.urls.push(url);
+          await user.urls.push( url );
           await user.save();
 
           res.status(200).send("Url saved");
+        } catch (err) {
+          res.status(500).send(err);
         }
-      } catch (err) {
-        res.status(500).send(err);
-      }
+      } //The following block runs when customCode is given
+      else {
+        try {
+          let user = await User.findOne({"urls.urlCode": customCode}) // Check if the custom code already exists
+
+          if (user){
+            //If customCode is already present in the document then we let anyone use it.
+            res.status(400).send("That url code is already used. Try another");
+        } //The custom url entered is unique and can be used to generate short url.
+          else {
+            const shortUrl = baseUrl + '/' + customCode;
+            const urlCode = customCode;
+
+            url = new Url({
+            longUrl,
+            shortUrl,
+            urlCode,
+            redirectCount: 0,
+            date: new Date()
+            });
+
+            await user.urls.push(url);
+            await user.save();
+
+            res.status(200).send("Url saved");
+          }
+        } catch (err) {
+          res.status(500).send(err);
+        }
     }
 });
 

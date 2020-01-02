@@ -25,20 +25,26 @@ router.post('/shorten', async (req, res) => {
   const longUrl = req.body.longUrl;
   const customCode = req.body.customCode;
   const baseUrl = config.get('baseUrl');
-
+  const name = config.get('name');
+  const email = config.get('email');
+  const password = config.get('password');
+  
   // Check if custom code exists
   //If no, the following block generates random urlCode
   if (!customCode) {
     try {
       //generating different randomUrl due to redirectcount problem(refer user.js)
-        urlCode = base.decTo62(generator.random_int()); //generating a mersenne-twister random number
-        let Code = await Url.findOne({ urlCode });
+      /* if (url) {
+        res.json(url);
+      } else { */
+        urlCode = padDigits(base.decTo62(generator.random_int()), 6); //generating a mersenne-twister random number
+        let user = await User.findOne({"urls.urlCode": urlCode});
         //The while block runs until the urlCode generated is unique
-        while (Code) {
-          urlCode = base.decTo62(generator.random_int()); //generating a mersenne-twister random number
-          Code = await Url.findOne({ urlCode });
+        while (user) {
+          urlCode = padDigits(base.decTo62(generator.random_int()), 6); //generating a mersenne-twister random number
+          user = await User.findOne({"urls.urlCode": urlCode});
         }
-        const shortUrl = baseUrl + '/' + padDigits(urlCode,6);
+        const shortUrl = baseUrl + '/' + urlCode;
 
         url = new Url({
         longUrl,
@@ -54,7 +60,8 @@ router.post('/shorten', async (req, res) => {
         res.json(url);
       //}
     } catch (err) {
-      res.status(500).json(err);
+      console.error(err);
+      res.status(500).json('Server error');
     }
   } //The following block runs when customCode is given
   else {
@@ -64,7 +71,7 @@ router.post('/shorten', async (req, res) => {
 
       if (user) {  
         //No user can use customUrl already present in the database.
-        res.status(500).json("That url code is already used. Try another");
+        res.status(400).json("That url code is already used. Try another");
     } //The custom url entered is unique and can be used to generate short url.
       else {
         const shortUrl = baseUrl + '/' + customCode;
@@ -84,7 +91,8 @@ router.post('/shorten', async (req, res) => {
         res.json(url);
       }
     } catch (err) {
-      res.status(500).json(err);
+      console.error(err);
+      res.status(500).json('Server error');
     }
   }
   });
