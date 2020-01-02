@@ -211,10 +211,10 @@ router.post('/shorten/:token/:name', async (req, res) => {
           let Code = await Url.findOne({ urlCode });
           //The while block runs until the urlCode generated is unique
           while (Code) {
-          urlCode = base.decTo62(generator.random_int()); //generating a mersenne-twister random number
+          urlCode = padDigits(base.decTo62(generator.random_int())); //generating a mersenne-twister random number
           Code = await Url.findOne({ urlCode });
           }
-          const shortUrl = baseUrl + '/' + padDigits(urlCode,6);
+          const shortUrl = baseUrl + '/' + urlCode;
     
           url = new Url({
           longUrl,
