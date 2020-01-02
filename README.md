@@ -50,7 +50,9 @@ If the installation was successful, you should be able to run the following comm
 
 ## TODO
 
-- [x] Use form.urlencoded method to extract url data
-- [ ] Alternative for `valid-url` module to check urls
-- [x] Make code 6 digit psuedo-random.
-- [x] Add option for the user to give custom short url
+- [ ] Verifyfing whether the email registered is valid.
+- [ ] Verifying whether the url entered is valid
+- [ ] Fixing error of push coming sometimes
+- [ ] remove redirects everywhere and give responses in the text mentioned at whatsapp
+- [ ] fixing x-auth token verification. Any token is working
+- [ ] passing x-auth token in headers
