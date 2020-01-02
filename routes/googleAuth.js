@@ -25,6 +25,7 @@ router.get('/', async (req, res) => {
             access_type: 'offline',
             scope: defaultScope
         });
+        //If redirect not possible, we can send url to frontend
         res.redirect(url);
 })
 

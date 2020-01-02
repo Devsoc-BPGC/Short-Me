@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken");
 const config = require('config');
 const User = require("../models/User");
 const Url = require("../models/Url");
-const querystring = require('querystring'); //Just added to send query
 const verify = require('../verifyToken');
 const MT = require('mersenne-twister');
 const base = require('base-converter');
@@ -20,18 +19,6 @@ const {
 function hasWhiteSpace(s) {
   return /\s/g.test(s);
 }
-
-//Since no session we are not using redirectLogin so need to find different way to redirect back to loginpage in case of user not found.
-// Login middleware
-/* const redirectLogin = (req, res, next) => {
-  if(!req.session.userId) {
-    console.log(req.session.userId);
-    res.redirect('/api/user/loginpage'); //redirecting becomes easier if we change name from login to loginpage
-  } else {
-    next();
-  }
-}
- */
 
 // @route   POST /api/user/register
 // @desc    Register user
@@ -51,18 +38,19 @@ router.post("/register", async (req, res) => {
   });
 
   if (emailExist) {
-    res.status(400).send("Email already exists");
+    return res.status(400).send("Email already exists");
   }
   
   const nameExist = await User.findOne({
     name: req.body.name
   });
+
   if (nameExist) {
-    res.status(400).send("Username already exists");
+    return res.status(400).send("Username already exists");
   }
 
   if(hasWhiteSpace(req.body.name)){
-    res.status(400).send("Username cannot contain a whitespace");
+    return res.status(400).send("Username cannot contain a whitespace");
   }
   // Hash passwords
   const salt = await bcrypt.genSalt();
@@ -79,12 +67,10 @@ router.post("/register", async (req, res) => {
   try {
     await user.save();
 
-    res.send({
-      user_id: user._id
-    })
+    return res.status(200).send('Registration successful!');
 
   } catch (err) {
-    res.status(400).send(err);
+    return res.status(400).send(err);
   }
 });
 
@@ -99,21 +85,24 @@ router.post("/login", async (req, res) => {
   } = loginValidation(req.body);
 
   if (error) {
-    res.status(400).send(error.details[0].message);
+    return res.status(400).send(error.details[0].message);
   }
 
   // Check if email exists
   let user = await User.findOne({
     email: req.body.email
   });
+
   if (!user) {
-    res.status(400).send("Email or the password is wrong");
+    return res.status(400).send("Email or the password is wrong");
   }
+
   // Check if password is correct
   const validPass = await bcrypt.compare(req.body.password, user.password);
-  if (!validPass) {
-    res.status(400).send("Email or the password is wrong");
+  if (!validPass){
+    return res.status(400).send("Email or the password is wrong");
   }
+
   // Create and assign a token
   const TOKEN_SECRET = config.get("tokenSecret")
   const token = jwt.sign({_id: user._id}, TOKEN_SECRET);
@@ -141,12 +130,10 @@ router.post('/shorten', verify, async (req, res) => {
   const user_id = req.header('user_id');
   
   try {
-    let user = await User.findById(user_id);
-    res.send(user);
+    var user = await User.findById(user_id);
   } catch (err) {
-    res.status(500).send("User not found");
+    return res.status(500).send("User not found");
   }
-
   const longUrl = req.body.longUrl;
   const customCode = req.body.customCode;
 
@@ -158,20 +145,23 @@ router.post('/shorten', verify, async (req, res) => {
     }
     //No two users can have same randomurl since both of them should have different redirectCount and no way to tell if they have same hash
     //Another reason is that the users might generate short url at different time and one user might have generated some redirectCount in that time.  
-     let userp = await User.findOne({"urls.longUrl": longUrl});
-      if(userp.name === username){
-        return res.status(422).json('You already have this longUrl.');
-      }
+     
       //No two users can have same randomurl since both of them should have different redirectCount and no way to tell if they have same hash
       //Another reason is that the users might generate short url at different time and one user might have generated some redirectCount in that time.  
       if (!customCode) {
+        let userpresent = await User.findOne({"urls.longUrl": longUrl});
+        if(userpresent){
+        if(userpresent.name === user.name){
+          return res.status(422).json('You already have this longUrl.');
+          }
+        }
         try {
           urlCode = padDigits(base.decTo62(generator.random_int()), 6); //generating a mersenne-twister random number
-          let user = await User.findOne({"urls.urlCode": urlCode});
+          let users = await User.findOne({"urls.urlCode": urlCode});
           //The while block runs until the urlCode generated is unique
-          while (user) {
+          while (users) {
           urlCode = padDigits(base.decTo62(generator.random_int()), 6); //generating a mersenne-twister random number
-          user = await User.findOne({"urls.urlCode": urlCode});
+          users = await User.findOne({"urls.urlCode": urlCode});
           }
           const shortUrl = baseUrl + '/' + urlCode;
           
@@ -186,16 +176,16 @@ router.post('/shorten', verify, async (req, res) => {
           await user.urls.push( url );
           await user.save();
 
-          res.status(200).send("Url saved");
+          return res.status(200).send("Url saved");
         } catch (err) {
-          res.status(500).send(err);
+          return res.status(500).send(err);
         }
       } //The following block runs when customCode is given
       else {
         try {
-          let user = await User.findOne({"urls.urlCode": customCode}) // Check if the custom code already exists
+          let users = await User.findOne({"urls.urlCode": customCode}) // Check if the custom code already exists
 
-          if (user){
+          if (users){
             //If customCode is already present in the document then we let anyone use it.
             res.status(400).send("That url code is already used. Try another");
         } //The custom url entered is unique and can be used to generate short url.
@@ -214,10 +204,10 @@ router.post('/shorten', verify, async (req, res) => {
             await user.urls.push(url);
             await user.save();
 
-            res.status(200).send("Url saved");
+            return res.status(200).send("CustomUrl saved");
           }
         } catch (err) {
-          res.status(500).send(err);
+          return res.status(500).send(err);
         }
     }
 });
