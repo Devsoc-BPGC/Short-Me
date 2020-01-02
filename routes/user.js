@@ -114,6 +114,7 @@ router.post("/login", async (req, res) => {
 // @desc    Dashboard for the logged in  user ( private route )
 router.get('/dashboard', verify, async (req, res) => {
   const user_id = req.header('user_id');
+  if(!user_id) return res.status(500).send('user_id not provided');
   try {
     let user = await User.findById(user_id);
     res.send(user);
