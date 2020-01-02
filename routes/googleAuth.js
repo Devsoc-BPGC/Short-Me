@@ -79,7 +79,10 @@ router.get('/auth/google/callback', function (req, res) {
             // Create and assign a token
             const TOKEN_SECRET = config.get("tokenSecret")
             const token = jwt.sign({_id: user._id}, TOKEN_SECRET);
-            res.header("auth-token", token).json({"user_id": user._id});
+            res.json({
+                "user_id": user._id,
+                "auth-token": token
+              });
             }
         });
     }

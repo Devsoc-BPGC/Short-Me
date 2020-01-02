@@ -106,7 +106,10 @@ router.post("/login", async (req, res) => {
   // Create and assign a token
   const TOKEN_SECRET = config.get("tokenSecret")
   const token = jwt.sign({_id: user._id}, TOKEN_SECRET);
-  res.header("auth-token", token).json({"user_id": user._id});
+  res.json({
+    "user_id": user._id,
+    "auth-token": token
+  });
 });
 
 // @route   GET /api/user/dashboard
@@ -177,7 +180,10 @@ router.post('/shorten', verify, async (req, res) => {
           await user.urls.push( url );
           await user.save();
 
-          return res.status(200).json({"msg": "Url saved"});
+          return res.status(200).json({
+            "Message": "Url saved",
+            "short_url": url.shortUrl
+          });
         } catch (err) {
           return res.status(500).json({"error": err});
         }
