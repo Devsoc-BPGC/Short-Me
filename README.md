@@ -58,4 +58,4 @@ If the installation was successful, you should be able to run the following comm
 - [x] fixing x-auth token verification. Any token is working
 - [x] passing x-auth token in headers
 - [ ] check customCode does not contain spaces, new line character
-- [ ] email checking isn't caps sensitive
+- [x] email checking isn't caps sensitive

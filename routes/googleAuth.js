@@ -52,15 +52,15 @@ router.get('/auth/google/callback', function (req, res) {
                 userEmail = me.data.emailAddresses[0].value;
                 
                 const emailExist = await User.findOne({
-                    email: userEmail
+                    email: userEmail.toLowerCase()
                   });
-                
+                  
                 // Create a user in database if user does not exist already
                 if ( !emailExist ) {
                     // Create a new user
                     const user = new User({
                         name: userName,
-                        email: userEmail,
+                        email: userEmail.toLowerCase(),
                         password: 'googleauthenticated'
                     });
                     try {
@@ -73,7 +73,7 @@ router.get('/auth/google/callback', function (req, res) {
 
                 // Now get that user's id
                 const user = await User.findOne({
-                    email: userEmail
+                    email: userEmail.toLowerCase()
                   });
 
             // Create and assign a token
