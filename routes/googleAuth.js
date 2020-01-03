@@ -88,4 +88,56 @@ router.get('/auth/google/callback', function (req, res) {
     }
 });
 
+// @route   POST api/login/google/android
+// @desc    route for android client to send oauth tokens in body
+//          and get user id and json web token in response 
+router.post('/android', function (req, res) {
+    // get token from body of request
+    const tokens = req.body.tokens
+    oAuth2Client.setCredentials(tokens);
+    const people = google.people({ version: 'v1', auth: oAuth2Client});
+    const me = await people.people.get({ 
+            auth: oAuth2Client,
+            resourceName: 'people/me', 
+            personFields: 'names,emailAddresses',
+            });
+
+    userName = me.data.names[0].displayName;
+    userEmail = me.data.emailAddresses[0].value;
+    
+    const emailExist = await User.findOne({
+        email: userEmail.toLowerCase()
+        });
+        
+    // Create a user in database if user does not exist already
+    if ( !emailExist ) {
+        // Create a new user
+        const user = new User({
+            name: userName,
+            email: userEmail.toLowerCase(),
+            password: 'googleauthenticated'
+        });
+        try {
+            await user.save();
+        } catch (err) {
+            res.status(400).json({"error": err});
+        }
+
+    }
+
+    // Now get that user's id
+    const user = await User.findOne({
+        email: userEmail.toLowerCase()
+        });
+
+// Create and assign a token
+const TOKEN_SECRET = config.get("tokenSecret")
+const token = jwt.sign({_id: user._id}, TOKEN_SECRET);
+
+res.json({
+    "user_id": user._id,
+    "auth-token": token
+    });
+});
+
 module.exports = router;
