@@ -19,6 +19,9 @@ document.querySelector('#form').addEventListener('submit', async (e) => {
 				ClipBoard(res.data.shortUrl)
 			})
 		})
+		.catch(err => {
+			resultLink.innerHTML = `<h3 id="result-link" style="display:inline"> <span id="result">Custom Url is already in use.</span></h3>`
+		})
 });
 
 function ClipBoard(result) {

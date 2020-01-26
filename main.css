@@ -205,8 +205,13 @@ footer>p {
 	color: red;
 }
 
+.main {
+	text-align: center;
+}
+
 #result-link {
 	display: inline;
+	text-align: center;
 }
 
 #copy {
