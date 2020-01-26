@@ -3,6 +3,10 @@ document.querySelector('#form').addEventListener('submit', async (e) => {
 	var url = document.querySelector('#input-field').value;
 	var urlCustom = document.querySelector('#custom-field').value;
 	var resultLink = document.querySelector('#result-link');
+	if (url.substring(0, 4) != 'http' && url.substring(0, 4) != 'HTTP' && url.substring(0, 4) != 'Http') {
+		resultLink.innerHTML = `<h3 id="result-link" style="display:inline"> <span id="result">Make sure your url starts with http or https</span></h3>`
+		return
+	}
 	var data = {
 		longUrl: url
 	}
