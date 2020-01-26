@@ -198,7 +198,7 @@ footer>p {
 	font-weight: 300;
 	font-size: .8rem;
 	position: absolute;
-	bottom: 20px;
+	bottom: 0px;
 }
 
 #result {
@@ -225,6 +225,8 @@ footer>p {
 	cursor: pointer;
 	max-height: 2.4rem;
 	margin-bottom: 1rem;
+	margin-left: 1rem;
+	margin-top: 1rem;
 }
 
 @media (max-width: 1240px) {
