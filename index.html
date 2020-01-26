@@ -30,11 +30,14 @@
         </nav>
         <section class="main">
             <h1>Generate your own bp-gc.in/ Short Link</h1>
-            <form action="">
-                <input type="text" placeholder="Enter a URL">
-                <button type="submit">Shorten</button>
+            <form action="post" id="form">
+                <div>
+                    <input type="text" placeholder="Enter Long URL" id="input-field">
+                    <input type="text" placeholder="Enter Custom Url" id="custom-field">
+                    <button type="submit">Shorten</button>
+                </div>
             </form>
-            <p>Want to choose your own shortened link? Design it yourself.</p>
+            <p id="result-link">Want to choose your own shortened link? Design it yourself. </p>
         </section>
         <section class="feature-grid">
             <div class="features">
@@ -87,6 +90,7 @@
         <p>Maintained by the Developers’ Society of BITS Goa</p>
     </footer>
 </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
 <script src="./main.js"></script>
 
 </html>
