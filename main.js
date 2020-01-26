@@ -17,7 +17,7 @@ document.querySelector('#form').addEventListener('submit', async (e) => {
 		}
 	axios.post('https://bp-gc.in/api/url/shorten', data)
 		.then((res) => {
-			resultLink.innerHTML = `<h3 id="result-link" style="display:inline">Here is your short link by devSoc : <span id="result">${res.data.shortUrl}</span></h3> <br/> <button id="copy"
+			resultLink.innerHTML = `<h3 id="result-link" style="display:inline">Here is your short link by devSoc : <span id="result"><a href="${res.data.shortUrl}" id="a-style" target="_blank">${res.data.shortUrl}</a></span></h3> <br/> <button id="copy"
 		onclick="ClipBoard()">Copy</button>`
 			document.querySelector('#copy').addEventListener('click', (e) => {
 				ClipBoard(res.data.shortUrl)
