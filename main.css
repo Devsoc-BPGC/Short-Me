@@ -118,11 +118,25 @@ nav a {
   outline: none;
   font-weight: 400;
   font-size: 14px;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
 }
 
 #custom-field {
-  margin-left: 0px;
+  width: 30%;
+  min-width: 150px;
+}
+
+#bpgc {
+  font-family: "Geomanist Regular";
+  font-style: normal;
+  font-weight: normal;
+  color: #f28c3f;
+  font-size: 21px;
+  line-height: 22px;
+  margin: 10px;
+  border: none;
+  padding: 8px 1px;
+  border-radius: 4px;
 }
 
 #shorten {
