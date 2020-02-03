@@ -91,7 +91,7 @@ router.get('/auth/google/callback', function (req, res) {
 // @route   POST api/login/google/android
 // @desc    route for android client to send oauth tokens in body
 //          and get user id and json web token in response 
-router.post('/android', function (req, res) {
+router.post('/android', async function (req, res) {
     // get token from body of request
     const tokens = req.body.tokens
     oAuth2Client.setCredentials(tokens);
