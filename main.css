@@ -1,0 +1,397 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Muli", sans-serif;
+}
+
+@font-face {
+  font-family: "Geomanist Regular";
+  font-style: normal;
+  font-weight: normal;
+  src: local("Geomanist Regular"), url("Geomanist-Regular.woff") format("woff");
+}
+
+body {
+  width: 100vw;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #140d63;
+  padding-top: 35px;
+}
+
+.container {
+  width: 90%;
+  margin: auto;
+}
+
+#copied {
+  display: none;
+  position: absolute;
+  z-index: -1;
+  margin: 20px;
+  font-size: 20px;
+  color: #f28c3f;
+font-weight: 600;
+}
+
+nav {
+  color: #f28c3f;
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 40px;
+  border-bottom: 1px solid hsla(26, 87%, 60%, 0.5);
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: 200;
+}
+
+.subtitle {
+  font-weight: 400;
+  font-size: 21px;
+  margin: 8px 0px 8px 0px;
+  font-family: "Geomanist Regular";
+}
+
+@media (max-width: 940px) {
+  .subtitle {
+    display: none;
+  }
+}
+
+nav h1 {
+  font-size: 36px;
+  font-weight: 800;
+  margin-right: 8px;
+}
+
+nav h1,
+nav p {
+  display: inline;
+  padding-top: 10px;
+}
+
+nav a {
+  color: #f28c3f;
+  text-decoration: none;
+}
+
+.nav-links {
+  padding-top: 10px;
+}
+
+.nav-links div {
+  display: inline;
+  padding: 6px 10px;
+  margin-right: 20px;
+}
+
+.login {
+  color: white;
+  font-weight: normal;
+}
+
+.signup {
+  border: 1px solid #f28c3f;
+}
+
+.main {
+  /* width: 70%; */
+  margin: auto;
+  max-width: 750px;
+}
+
+.main h1 {
+  font-family: "Geomanist Regular";
+  font-size: 2rem;
+  color: white;
+  text-align: center;
+  padding-top: 20px;
+  font-weight: 400;
+}
+
+.main form > div {
+  align-items: center;
+  justify-content: center;
+  margin-top: 50px;
+}
+
+.main form input {
+  height: 32px;
+  width: 44rem;
+  max-width: 80%;
+  border: none;
+  color: black;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  outline: none;
+  font-weight: 400;
+  font-size: 14px;
+  margin-bottom: 40px;
+}
+
+#custom-field {
+  width: 30%;
+  min-width: 150px;
+}
+
+#bpgc {
+  font-family: "Geomanist Regular";
+  font-style: normal;
+  font-weight: normal;
+  color: #f28c3f;
+  font-size: 21px;
+  line-height: 22px;
+  margin: 10px;
+  border: none;
+  padding: 8px 1px;
+  border-radius: 4px;
+}
+
+#shorten {
+  /* display: none; */
+}
+
+.main form button {
+  border: none;
+  background-color: #f28c3f;
+  padding: 12px 20px;
+  border-radius: 4px;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  cursor: pointer;
+  margin-bottom: 30px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.main p {
+  color: #f28c3f;
+  margin-top: 1rem;
+}
+
+div.features {
+  width: 80%;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-gap: 1.5rem;
+  grid-row-gap: 3rem;
+  margin-top: 85px;
+  margin-bottom: 85px;
+}
+
+div.feature {
+  color: white;
+  text-align: center;
+}
+
+div.number {
+  width: 50px;
+  height: 50px;
+  margin: auto;
+  font-size: 30px;
+  font-family: "Geomanist Regular";
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: middle;
+  padding: 10px;
+  margin-bottom: 1rem;
+  background: linear-gradient(180deg, #f28c3f 0%, rgba(242, 140, 63, 0) 100%);
+  opacity: 0.6;
+}
+
+.feature-heading {
+  margin-bottom: 0.7rem;
+}
+
+.feature-detail {
+  opacity: 0.75;
+  width: 70%;
+  margin: auto;
+  font-weight: 300;
+}
+
+footer {
+  width: 100%;
+  position: relative;
+  margin-top: 150px;
+  margin-bottom: 0px;
+  left: 0;
+  bottom: 0;
+  background-color: #0d0931;
+  padding: 10px 10%;
+}
+
+footer > div {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.logo img {
+  width: 80px;
+  margin-top: 30px;
+}
+
+.social-icons {
+  margin-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  text-align: center;
+}
+.social-icons p {
+  color: white;
+  margin-top: 8px;
+}
+
+.icons {
+  display: flex;
+}
+
+.icon img {
+  width: 25px;
+  height: 25px;
+  margin: 10px;
+}
+
+footer > div > p {
+  text-align: center;
+  width: 100%;
+  color: white;
+  font-weight: 300;
+  padding: 20px;
+  bottom: 0px;
+}
+
+#more {
+  display: none;
+  margin-top: 0px;
+}
+
+#result {
+  color: red;
+}
+
+.main {
+  text-align: center;
+}
+
+#result-link {
+  display: inline;
+  text-align: center;
+}
+
+#result-link a {
+  color: #f28c3f;
+  text-decoration: none;
+  border-bottom: 1.25px solid #f28c3f;
+}
+
+#copy {
+  border: none;
+  background-color: #f28c3f;
+  padding: 5px 15px;
+  border-radius: 4px;
+  margin-left: 2rem;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  margin-left: 1rem;
+  margin-top: 1rem;
+}
+
+#a-style {
+  text-decoration: none;
+  color: red !important;
+}
+
+@media (max-width: 1240px) {
+  html {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 940px) {
+  html {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 780px) {
+  html {
+    font-size: 10px;
+  }
+
+  .main h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 475px) {
+  nav {
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+  }
+
+  nav h1,
+  nav p {
+    margin-bottom: 1rem;
+  }
+
+  .main {
+    width: 90%;
+    margin: auto;
+  }
+
+  form {
+    width: 100%;
+    flex-direction: column;
+    margin-bottom: 1rem;
+  }
+
+  form input {
+    width: 80%;
+    margin: auto;
+  }
+
+  button {
+    width: 90px;
+    padding: 15px;
+    margin-top: 2rem !important;
+    cursor: pointer !important;
+    margin-bottom: 30px;
+  }
+
+  .main p {
+    text-align: center;
+  }
+
+  footer {
+    position: relative;
+    background-color: #0d0931;
+    margin-top: 3rem;
+  }
+
+  footer > div {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .icons {
+    justify-content: space-around;
+    margin-top: 1rem;
+  }
+
+  .icon {
+    margin: 0;
+  }
+}

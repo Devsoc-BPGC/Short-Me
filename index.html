@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Short Url</title>
+  <link rel="stylesheet" href="./main.css" />
+  <link href="https://fonts.googleapis.com/css?family=Muli:200,400,800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="container">
+    <nav>
+      <div class="nav-brand">
+        <span class="heading">
+          <a href="./index.html">
+            <h1>Short Me</h1>
+          </a>
+          <p>by <a href="http://devsoc.club">DevSoc</a></p>
+        </span>
+        <p style="display: block;" class="subtitle">
+          BITS Goa's Link Shortening Service
+        </p>
+      </div>
+      <!-- <div class="nav-links">
+                <div class="login">
+                    Log In
+                </div>
+                <div class="signup">
+                    Sign up
+                </div>
+            </div>  -->
+    </nav>
+    <section class="main">
+      <h1>Generate your own bp-gc.in/ Short Link</h1>
+      <form action="post" id="form">
+        <div>
+          <input type="text" placeholder="Enter a URL" id="input-field" />
+          <button type="submit" id="shorten">Shorten</button>
+        </div>
+        <div id="more">
+          <div>
+            <span id="bpgc">http://bp-gc.in/</span>
+            <input type="text" placeholder="Enter 6 Character code" id="custom-field" />
+          </div>
+          <button type="submit">Shorten</button>
+        </div>
+      </form>
+
+      <p id="result-link">
+        <span id="customURLHelper">
+          Want to choose your own shortened link?
+        </span>
+        <a onclick="showCustomLink();" href="javascript:void(0);" id="showCustomLink">Design it yourself.</a>
+      </p>
+      <span id="copied">Copied</span>
+    </section>
+    <section class="feature-grid">
+      <div class="features">
+        <div class="feature">
+          <div class="number">1</div>
+          <h1 class="feature-heading">Enter</h1>
+          <p class="feature-detail">
+            Enter the entire URL you want to shorten in the field given above.
+          </p>
+        </div>
+        <div class="feature">
+          <div class="number">2</div>
+          <h1 class="feature-heading">Shorten</h1>
+          <p class="feature-detail">
+            Either let us randomly shorten your link, or design your own
+            shortened link.
+          </p>
+        </div>
+        <div class="feature">
+          <div class="number">3</div>
+          <h1 class="feature-heading">Share</h1>
+          <p class="feature-detail">
+            Share the shortened link wherever you like.
+          </p>
+        </div>
+        <div class="feature">
+          <div class="number">4</div>
+          <h1 class="feature-heading">Analyse</h1>
+          <p class="feature-detail">
+            Sign up for free to save your short URLs and review relevant
+            analytics and metrics.
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+  <footer>
+    <div>
+      <div class="logo">
+        <a href="http://devsoc.club" target="_blank"><img src="./img/DevSoc Logo 1.png" alt="" /></a>
+      </div>
+      <div class="social-icons">
+        <div class="icons">
+          <div class="icon">
+            <a href="https://www.instagram.com/devsocbitsgoa/" target="_blank"><img src="./img/instagram.png"
+                alt="" /></a>
+          </div>
+          <div class="icon">
+            <a href="https://www.linkedin.com/company/mobile-applications-club" target="_blank"><img
+                src="./img/linkedin.png" alt="" /></a>
+          </div>
+          <div class="icon">
+            <a href="https://m.facebook.com/MACBITSGoa/" target="_blank"><img src="./img/facebook.png" alt="" /></a>
+          </div>
+        </div>
+        <p>Have a query? Email us.</p>
+      </div>
+    </div>
+    <div>
+      <p>Made with ❤️ by Developers’ Society of BITS Goa</p>
+    </div>
+  </footer>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
+<script src="./main.js"></script>
+<script src="./notify.min.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script>
+  var toggle = false;
+  function showCustomLink() {
+    $("#more").slideToggle(200);
+    $("#shorten").slideToggle(100);
+    $("#customURLHelper").slideToggle(500);
+    $("#showCustomLink").text(toggle ? "Design it yourself." : "Go Back");
+    toggle = !toggle;
+  }
+</script>
+
+</html>
