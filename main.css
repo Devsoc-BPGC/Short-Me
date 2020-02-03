@@ -25,6 +25,16 @@ body {
   margin: auto;
 }
 
+#copied {
+  display: none;
+  position: absolute;
+  z-index: -1;
+  margin: 20px;
+  font-size: 20px;
+  color: #f28c3f;
+font-weight: 600;
+}
+
 nav {
   color: #f28c3f;
   display: flex;
@@ -146,7 +156,7 @@ nav a {
 .main form button {
   border: none;
   background-color: #f28c3f;
-  padding: 12px 30px;
+  padding: 12px 20px;
   border-radius: 4px;
   color: white;
   font-weight: bold;
@@ -188,7 +198,7 @@ div.number {
   display: flex;
   justify-content: center;
   align-items: middle;
-  padding: 5px;
+  padding: 10px;
   margin-bottom: 1rem;
   background: linear-gradient(180deg, #f28c3f 0%, rgba(242, 140, 63, 0) 100%);
   opacity: 0.6;
@@ -208,7 +218,7 @@ div.number {
 footer {
   width: 100%;
   position: relative;
-  margin-top: 30px;
+  margin-top: 150px;
   margin-bottom: 0px;
   left: 0;
   bottom: 0;
@@ -291,7 +301,6 @@ footer > div > p {
   color: white;
   font-weight: bold;
   cursor: pointer;
-  max-height: 2.4rem;
   margin-bottom: 1rem;
   margin-left: 1rem;
   margin-top: 1rem;
