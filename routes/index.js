@@ -15,15 +15,24 @@ router.get('/:code', async (req, res) => {
         if (user){
             const url = await User.findOne({"urls.urlCode": code}, {"_id": 0, "urls.$":1 });
             const longUrl = url["urls"][0]["longUrl"];
-            res.redirect(longUrl);
-            user = await User.findOneAndUpdate({"urls.urlCode": code}, {$inc: {"urls.$.redirectCount": 1}});
-            await user.save();
+            if (longUrl) {
+                console.log(longUrl);
+                res.redirect(longUrl);
+                user = await User.findOneAndUpdate({"urls.urlCode": code}, {$inc: {"urls.$.redirectCount": 1}});
+                await user.save();
+                return;
+            }
+            else {
+                return res.status(500).json({
+                    error: 'Internal server error. Long Url not found'
+                });
+            }
         } else {
-            res.status(404).json('Url not found.');
+            return res.status(404).json('Url not found.');
         }
     } catch (err) {
         console.error(err);
-        res.status(500).json('Server error');
+        return res.status(500).json('Server error');
         
     }
 })

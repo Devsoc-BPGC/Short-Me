@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const connectDB = require('./config/db');
 const dotenv = require('dotenv');
+const cors = require('cors');
 const app = express();
 
 dotenv.config();
@@ -9,7 +10,11 @@ dotenv.config();
 // Connect to database
 connectDB();
 
+var corsoption = {
+    origin: 'https://bp-gc.in'
+}
 // Middleware functions
+app.use(cors(corsoption));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended:true }));
 
