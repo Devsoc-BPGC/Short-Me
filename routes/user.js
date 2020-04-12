@@ -16,7 +16,7 @@ const {
 } = require("../validation");
 
 // @route   POST /api/user/register
-//          expects 'authToken' in header
+//          expects 'token' in header
 // @desc    Register user
 router.post("/register", verify, async (req, res) => {
   // Validate the register data
@@ -104,7 +104,7 @@ router.post("/login", async (req, res) => {
 */
 
 // @route   GET /api/user/dashboard
-// expects 'authToken'
+// expects 'token'
 // @desc    Dashboard for the logged in  user ( private route )
 router.get('/dashboard', verify, async (req, res) => {
   userData = req.user;
@@ -129,7 +129,7 @@ router.get('/dashboard', verify, async (req, res) => {
 })
 
 // @route   POST /api/user/shorten
-// expects 'authToken' in header
+// expects 'token' in header
 // @desc    Api for generating short url from dashboard
 router.post('/shorten', verify, async (req, res) => { 
   userData = req.user;
