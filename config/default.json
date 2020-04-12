@@ -4,5 +4,5 @@
     "name" : "@Admin",          
     "email" : "Admin@123",     
     "password" : "1234567",    
-    "tokenSecret": "extremely_secret_key"
+    "tokenSecret": "BadBitches"
 }
