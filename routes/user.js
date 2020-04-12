@@ -15,66 +15,56 @@ const {
   loginValidation
 } = require("../validation");
 
-//Checks whitespaces in username (even white spaces like tab)
-function hasWhiteSpace(s) {
-  return /\s/g.test(s);
-}
-
 // @route   POST /api/user/register
+//          expects 'authToken' in header
 // @desc    Register user
-router.post("/register", async (req, res) => {
+router.post("/register", verify, async (req, res) => {
   // Validate the register data
+  userData = req.user;
+  console.log(userData);
   const {
     value,
     error
-  } = registerValidation(req.body);
+  } = registerValidation(userData);
 
   if (error) {
   return res.status(500).json({"error": error.details[0].message});
   }
   // Check if user already exists
   const emailExist = await User.findOne({
-    email: req.body.email.toLowerCase()
+    email: userData.email.toLowerCase()
   });
 
   if (emailExist) {
-    return res.status(400).json({"error": "Email already exists"});
+    return res.status(200).json({
+      "success": false,
+      "error": "Email already exists"
+    });
   }
-  
-  const nameExist = await User.findOne({
-    name: req.body.name
-  });
-
-  if (nameExist) {
-    return res.status(400).json({"error": "Username already exists"});
-  }
-
-  if(hasWhiteSpace(req.body.name)){
-    return res.status(400).json({"error": "Username cannot contain a whitespace"});
-  }
-  // Hash passwords
-  const salt = await bcrypt.genSalt();
-  const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
   // Create a new user 
   let user = new User({
-    name: req.body.name,
-    email: req.body.email.toLowerCase(),
-    password: hashedPassword,
+    email: userData.email.toLowerCase(),
     urls: []
   });
 
   try {
     await user.save();
 
-    return res.status(200).json({"msg": "Registration successful!"});
+    return res.status(200).json({
+      "success": true,
+      "msg": "Registration successful!"
+    });
 
   } catch (err) {
-    return res.status(400).json({"error": err});
+    return res.status(400).json({
+      "success": false,      
+      "error": err
+    });
   }
 });
 
-
+/* Commented because we don't need this is CSA app
 // @route   POST /api/user/login
 // @desc    Login user
 router.post("/login", async (req, res) => {
@@ -82,7 +72,7 @@ router.post("/login", async (req, res) => {
   const {
     value,
     error
-  } = loginValidation(req.body);
+  } = loginValidation(req.user);
 
   if (error) {
     return res.status(400).json({"error": error.details[0].message});
@@ -111,32 +101,47 @@ router.post("/login", async (req, res) => {
     "auth-token": token
   });
 });
+*/
 
 // @route   GET /api/user/dashboard
-// expects 'auth-token' and 'user-id' in header of request
+// expects 'authToken'
 // @desc    Dashboard for the logged in  user ( private route )
 router.get('/dashboard', verify, async (req, res) => {
-  const user_id = req.header('user_id');
-  if(!user_id) return res.status(500).json({"error": "user_id not provided"});
+  userData = req.user;
   try {
-    let user = await User.findById(user_id);
-    res.json(user);
+    let user = await User.findOne({
+      email: userData.email.toLowerCase()
+    });
+    if (!user) {
+      return res.status(500).json({
+        "success":false,
+        "error": "User does not exist"
+      });
+    }
+    return res.json(user);
   } catch (err) {
-    res.status(500).json({"error": "User not found"});
+    res.status(500).json({
+      "success": false,
+      "error": "Internal Server Error"
+    });
   }
 
 })
 
 // @route   POST /api/user/shorten
-// expects 'auth-token' and 'user-id' in header of request
+// expects 'authToken' in header
 // @desc    Api for generating short url from dashboard
-router.post('/shorten', verify, async (req, res) => {
-  const user_id = req.header('user_id');
-  
+router.post('/shorten', verify, async (req, res) => { 
+  userData = req.user;
   try {
-    var user = await User.findById(user_id);
+    var user = await User.findOne({
+      email: userData.email.toLowerCase()
+    });
   } catch (err) {
-    return res.status(500).json({"error": "User not found"});
+    return res.status(500).json({
+      "success": false,
+      "error": "User not found"
+    });
   }
   const longUrl = req.body.longUrl;
   const customCode = req.body.customCode;
@@ -156,7 +161,10 @@ router.post('/shorten', verify, async (req, res) => {
         let userpresent = await User.findOne({"urls.longUrl": longUrl});
         if(userpresent){
         if(userpresent.name === user.name){
-          return res.status(422).json({"error": "You already have this longUrl."});
+          return res.status(200).json({
+            "success": false,
+            "error": "You already have this longUrl."
+          });
           }
         }
         try {
@@ -194,7 +202,10 @@ router.post('/shorten', verify, async (req, res) => {
 
           if (users){
             //If customCode is already present in the document then we let anyone use it.
-            res.status(400).json({"error": "That url code is already used. Try another"});
+            res.status(200).json({
+              "success": false,
+              "error": "That url code is already used. Try another"
+            });
         } //The custom url entered is unique and can be used to generate short url.
           else {
             const shortUrl = baseUrl + '/' + customCode;
@@ -217,7 +228,10 @@ router.post('/shorten', verify, async (req, res) => {
             });
           }
         } catch (err) {
-          return res.status(500).json({"error": err});
+          return res.status(500).json({
+            "success": false,
+            "error": err
+          });
         }
     }
 });

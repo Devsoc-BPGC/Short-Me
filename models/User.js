@@ -11,26 +11,12 @@ const urlSchema = new mongoose.Schema({
 const { Url, urlSchema } = require('../models/Url');
 
 const userSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        min: 6,
-        max: 255
-    },
     email: {
         type: String,
         required: true,
         max: 255
     },
-    password: {
-        type: String,
-        required: true,
-        max: 1024,
-        min: 6
-    },
-    
     urls: [urlSchema], //urls: [urlSchema]
-
     date: {
         type: Date,
         default: Date.now
