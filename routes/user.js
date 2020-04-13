@@ -367,6 +367,30 @@ router.patch('/url/:id', verify, async (req, res) => {
     });
   }
 })
+
+
+// @route   DELETE /api/user
+// expects 'token'
+// @desc    Delete the user whose email is given in token
+router.delete('/', verify, async (req, res) => {
+  const userData = req.user;
+  try {
+    await User.findOneAndDelete({
+      email: userData.email.toLowerCase()
+    });
+    res.status(200).json({
+      "success": true,
+      "msg": "User deleted"
+    })
+  } catch (err) {
+    res.status(500).json({
+      "success": false,
+      "error": "Internal Server Error"
+    });
+  }
+})
+
+
 /*
 router.get('/loginpage',  (req, res) => {
   //Render login page
