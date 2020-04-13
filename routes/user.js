@@ -21,7 +21,6 @@ const {
 router.post("/register", verify, async (req, res) => {
   // Validate the register data
   userData = req.user;
-  console.log(userData);
   const {
     value,
     error
@@ -143,7 +142,8 @@ router.post('/shorten', verify, async (req, res) => {
       "error": "User not found"
     });
   }
-  const longUrl = req.body.longUrl;
+  if (user) {
+    const longUrl = req.body.longUrl;
   const customCode = req.body.customCode;
 
   const baseUrl = config.get('baseUrl');
@@ -158,15 +158,13 @@ router.post('/shorten', verify, async (req, res) => {
       //No two users can have same randomurl since both of them should have different redirectCount and no way to tell if they have same hash
       //Another reason is that the users might generate short url at different time and one user might have generated some redirectCount in that time.  
       if (!customCode) {
-        let userpresent = await User.findOne({"urls.longUrl": longUrl});
-        if(userpresent){
-        if(userpresent.name === user.name){
-          return res.status(200).json({
+        for (var i=0; i < user.urls.length; i++){
+         if (user.urls[i].longUrl === longUrl) {
+            return res.status(200).json({
             "success": false,
             "error": "You already have this longUrl."
           });
-          }
-        }
+         }}
         try {
           urlCode = padDigits(base.decTo62(generator.random_int()), 6); //generating a mersenne-twister random number
           let users = await User.findOne({"urls.urlCode": urlCode});
@@ -234,6 +232,13 @@ router.post('/shorten', verify, async (req, res) => {
           });
         }
     }
+  } else{
+    res.status(500).json({
+      "success": false,
+      "error": "User does not exist"
+    });
+  }
+  
 });
 
 // @route   DELETE /api/user/url/:id
