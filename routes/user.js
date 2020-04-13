@@ -236,6 +236,138 @@ router.post('/shorten', verify, async (req, res) => {
     }
 });
 
+// @route   DELETE /api/user/url/:id
+// expects 'token'
+// @desc    Delete the specified shortened url from the user
+router.delete('/url/:id', verify, async (req, res) => {
+  const userData = req.user;
+  const id = req.params.id;
+  if (!id){
+    return res.status(500).json({
+      "success": false,
+      "error": "id of the url object not given"
+    })
+  }
+  try {
+    const user = await User.findOne({
+      email: userData.email.toLowerCase()
+    });
+    if (!user) {
+      return res.status(500).json({
+        "success": false,
+        "error": "User does not exist"
+      });
+    }
+  let flag = 1;
+  for (var i=0; i < user.urls.length; i++){
+   if (user.urls[i]._id.toString() === id) {
+      user.urls.splice(i,1);
+      flag = 0;
+      break;
+   }}
+   if (flag === 1){
+    return res.status(500).json({
+      "success": false,
+      "error": "No url with given custom code"
+    });
+  }
+    await user.save();
+    return res.status(200).json(user);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      "success": false,
+      "error": "Internal Server Error"
+    });
+  }
+})
+
+
+// @route   PATCH /api/user/url
+// expects 'token'
+// @desc    Patch the short url code or the long url code of a shortened url
+router.patch('/url/:id', verify, async (req, res) => {
+  const userData = req.user;
+  const id = req.params.id;
+  // optional parameters newCustomCode and newLongUrl
+  const customCode = req.body.newCustomCode;
+  const longUrl = req.body.newLongUrl;
+
+  if (!id){
+    return res.status(500).json({
+      "success": false,
+      "error": "id of the url object not given"
+    })
+  }
+  try {
+    const user = await User.findOne({
+      email: userData.email.toLowerCase()
+    });
+    if (!user) {
+      return res.status(500).json({
+        "success": false,
+        "error": "User does not exist"
+      });
+    }
+  let flag = 1;
+  for (var i=0; i < user.urls.length; i++){
+   if (user.urls[i]._id.toString() === id) {
+     if(customCode) {
+      // we need to check if the new custom code given by user is not used anywhere else in database
+      try {
+        let users = await User.findOne({"urls.urlCode": customCode}) // Check if the custom code already exists
+
+        if (users){
+          //If customCode is already present in the document then we dont let anyone use it.
+          return res.status(200).json({
+            "success": false,
+            "error": "That url code is already used. Try another"
+          });
+      } //The custom url entered is unique and can be used to generate short url.
+        else {
+          const baseUrl = config.get('baseUrl');
+          const shortUrl = baseUrl + '/' + customCode;
+          
+          // update the short url and custom code
+          user.urls[i].shortUrl = shortUrl;
+          user.urls[i].urlCode = customCode;
+
+          await user.save();
+        }
+      } catch (err) {
+        return res.status(500).json({
+          "success": false,
+          "error": err
+        });
+      }
+    }
+      // Update the longUrl without any checks as we don't care about multiple long urls
+      // and initilise the redirect count to zero if longUrl changed.
+      if(longUrl){
+        user.urls[i].longUrl = longUrl;
+        user.urls[i].redirectCount = 0;
+        
+        await user.save();
+      }
+      flag = 0;
+      break;
+   }}
+   if (flag === 1){
+    return res.status(500).json({
+      "success": false,
+      "error": "No url with given custom code"
+    });
+  }
+    return res.status(200).json(user);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      "success": false,
+      "error": "Internal Server Error"
+    });
+  }
+})
+/*
 router.get('/loginpage',  (req, res) => {
   //Render login page
   res.send("At login");
@@ -250,4 +382,5 @@ router.get('/signout',  (req, res) => {
   //Redirect to home page.
   return res.send("Signed out");
 })
+*/
 module.exports = router;
