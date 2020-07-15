@@ -1,8 +1,0 @@
-{
-    "mongoURI": "mongodb://localhost:27017/url-shortener",
-    "baseUrl": "https://bp-gc.in",
-    "name" : "@Admin",          
-    "email" : "Admin@123",     
-    "password" : "1234567",    
-    "tokenSecret": "BadBitches"
-}
