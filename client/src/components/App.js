@@ -1,11 +1,13 @@
-import React from "react";
+import './App.css';
+import React from 'react';
+import GoogleBtn from './googleLogin';
 
-const App = () => {
+function App() {
   return (
-    <div>
-      <h1>Client side For URL-Shortener</h1>
+    <div className="App" style={{ position: 'absolute', top: '50%', left: '48%' }}>
+      <GoogleBtn/>
     </div>
   );
-};
+}
 
 export default App;
