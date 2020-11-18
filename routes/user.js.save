@@ -367,11 +367,9 @@ router.patch('/url/:id', verify, async (req, res) => {
       "error": "No url with given custom code"
     });
   }
-	user.status = true;
+	
     return res.status(200).json({
-	"success":true,
-	user});
-
+user);
   } catch (err) {
     console.log(err);
     res.status(500).json({
