@@ -39,8 +39,8 @@ If the installation was successful, you should be able to run the following comm
 
 ## Install
 
-    $ git clone https://github.com/Devsoc-BPGC/Tiny-Url
-    $ cd Tiny-Url
+    $ git clone https://github.com/Devsoc-BPGC/Short-Me
+    $ cd Short-Me
     $ npm install
 
 
