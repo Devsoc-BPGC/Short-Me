@@ -5,6 +5,8 @@ const config = require('config');
 const MT = require('mersenne-twister');
 const generator = new MT();
 
+const fileRead = require('fs').promises.readFile('./hosts/hosts.txt', 'utf-8');
+
 const Url = require('../models/Url');
 const User = require('../models/User');
 
@@ -26,7 +28,14 @@ router.post('/shorten', async (req, res) => {
   //Check whether customCode has space, tab or new line character
   const customCode = req.body.customCode;
   const baseUrl = config.get('baseUrl');
-  
+
+  // Use the hosts file to check if any unsafe URL is being shortened
+  const contents = await fileRead;
+  const urlObj = new URL(longUrl);
+
+  if(contents.indexOf(urlObj.hostname) >= 0) {
+    return res.status(400).json({"error": "This URL will not be shortened"});
+  }
   // Check if custom code exists
   //If no, the following block generates random urlCode
   if (!customCode) {
