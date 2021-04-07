@@ -20,7 +20,7 @@ document.querySelector("#form").addEventListener("submit", async e => {
       customCode: urlCustom
     };
   axios
-    .post("https://bp-gc.in/api/url/shorten", data)
+    .post("/api/url/shorten", data)
     .then(res => {
       resultLink.innerHTML = `<h3 id="result-link" style="display:inline">Here is your short link by devSoc : <span id="result"><a href="${res.data.shortUrl}" id="a-style" target="_blank">${res.data.shortUrl}</a></span></h3> <br/> <button id="copy"
 		>Copy</button>`;
