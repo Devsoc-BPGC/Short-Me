@@ -1,3 +1,17 @@
+const urlObj = new URL(window.location.toString())
+if(urlObj.searchParams.has('authToken')){
+  sessionStorage.setItem('authToken', urlObj.searchParams.get('authToken'))
+  window.location.replace(urlObj.origin)
+}
+else {
+  if(!sessionStorage.authToken)
+    alert('Please sign in with Google before you can continue')
+  else
+    //TODO: make changes to html to notify user they're signed in
+    alert('Welcome back, user')
+}
+
+
 document.querySelector("#form").addEventListener("submit", async e => {
   e.preventDefault();
   var url = document.querySelector("#input-field").value;
