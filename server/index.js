@@ -4,6 +4,7 @@ const connectDB = require('./config/db');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const app = express();
+const path = require('path');
 
 dotenv.config();
 
@@ -18,7 +19,7 @@ app.use(cors(corsoption));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(express.static(__dirname));
+app.use(express.static(path.resolve(__dirname, 'public')));
 // Define Routes
 app.use('/', require('./routes/index'));
 app.use('/api/url', require('./routes/url'));
