@@ -30,10 +30,7 @@ router.post('/shorten', async (req, res) => {
   const baseUrl = config.get('baseUrl');
 
   // Use the hosts file to check if any unsafe URL is being shortened
-  const safe = await hostCheck.checkSafeURL(longUrl);
-  if(!safe) {
-    return res.status(400).json({"error": "This URL will not be shortened"});
-  }
+  if(await hostCheck.isURLBlocked(longUrl, res)) return;
   // Check if custom code exists
   //If no, the following block generates random urlCode
   if (!customCode) {

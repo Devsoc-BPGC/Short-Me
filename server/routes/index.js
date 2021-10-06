@@ -21,10 +21,7 @@ router.get('/:code', async (req, res) => {
                 console.log(longUrl);
 
                 // Use the hosts file to check if any unsafe URL is being shortened
-                const safe = await hostCheck.checkSafeURL(longUrl);
-                if(!safe) {
-                  return res.status(404).json({"error": "This URL was blocked"});
-                }
+                if(await hostCheck.isURLBlocked(longUrl, res)) return;
 
                 res.redirect(longUrl);
                 user = await User.findOneAndUpdate({"urls.urlCode": code}, {$inc: {"urls.$.redirectCount": 1}});
