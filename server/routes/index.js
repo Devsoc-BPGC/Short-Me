@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router();
 
+const hostCheck = require('../hosts/hostCheck');
+
 const Url = require('../models/Url');
 const User = require('../models/User');
 
@@ -17,6 +19,10 @@ router.get('/:code', async (req, res) => {
             const longUrl = url["urls"][0]["longUrl"];
             if (longUrl) {
                 console.log(longUrl);
+
+                // Use the hosts file to check if any unsafe URL is being shortened
+                if(await hostCheck.isURLBlocked(longUrl, res)) return;
+
                 res.redirect(longUrl);
                 user = await User.findOneAndUpdate({"urls.urlCode": code}, {$inc: {"urls.$.redirectCount": 1}});
                 await user.save();
