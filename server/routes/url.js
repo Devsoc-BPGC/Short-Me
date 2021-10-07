@@ -4,6 +4,7 @@ const base = require('base-converter');
 const config = require('config');
 const MT = require('mersenne-twister');
 const generator = new MT();
+const verify = require('../verifyToken');
 
 const hostCheck = require('../hosts/hostCheck');
 
@@ -23,7 +24,7 @@ function padDigits (number, digits) {
 
 // @route     POST /api/url/shorten
 // @desc      Create short URL from long URL
-router.post('/shorten', async (req, res) => {
+router.post('/shorten', verify, async (req, res) => {
   const longUrl = req.body.longUrl;
   //Check whether customCode has space, tab or new line character
   const customCode = req.body.customCode;

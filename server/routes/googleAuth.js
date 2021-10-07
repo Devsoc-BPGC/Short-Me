@@ -42,7 +42,7 @@ router.get('/auth/google/callback', function (req, res) {
                 console.log('Successfully authenticated');
                 oAuth2Client.setCredentials(tokens);
                 const people = google.people({ version: 'v1', auth: oAuth2Client});
-                const me = people.people.get({ 
+                const me = await people.people.get({ 
                         auth: oAuth2Client,
                         resourceName: 'people/me', 
                         personFields: 'names,emailAddresses',
@@ -79,10 +79,11 @@ router.get('/auth/google/callback', function (req, res) {
             // Create and assign a token
             const TOKEN_SECRET = config.get("tokenSecret")
             const token = jwt.sign({_id: user._id}, TOKEN_SECRET);
-            res.json({
-                "user_id": user._id,
-                "auth-token": token
-              });
+            res.redirect(`/?authToken=${token}&username=${userName}`)
+            // res.json({
+            //     "user_id": user._id,
+            //     "auth-token": token
+            //   });
             }
         });
     }

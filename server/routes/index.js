@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router();
+const path = require('path');
 
 const hostCheck = require('../hosts/hostCheck');
 
@@ -7,6 +8,12 @@ const Url = require('../models/Url');
 const User = require('../models/User');
 
 //This function updates the field redirectCount in both url and user 
+
+// @route GET /
+// @desc Serve the homepage
+router.get('/', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '..', 'public', 'root.html'))
+})
 
 // @route   GET /:code
 // @desc    Redirect short URL to original URL
